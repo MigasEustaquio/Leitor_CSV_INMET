@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-NOME_DO_ARQUIVO = "GOIANIA (A002)_2022-05-04_2022-05-11"
+NOME_DO_ARQUIVO = "GOIANIA (A002)_2022-05-06_2022-05-06"
 
 #Muda o tipo dos dados do df de string para numerico
 def string_para_numerico(df):
