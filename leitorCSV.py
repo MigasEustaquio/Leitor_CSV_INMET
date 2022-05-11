@@ -1,24 +1,27 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-NOME_DO_ARQUIVO = "GOIANIA (A002)_2022-05-06_2022-05-06"
+# NOME_DO_ARQUIVO = "GOIANIA (A002)_2022-05-06_2022-05-06"
+NOME_DO_ARQUIVO = "GOIANIA (A002)_2022-05-04_2022-05-11"
+
+#Lê o arquvo csv e substitui "," por "."
+def ler_arquivo():
+    df = pd.read_csv("arquivos/" + NOME_DO_ARQUIVO + ".csv", sep=";").fillna(0)
+    df = df.replace(',', '.', regex=True)
+    return df
 
 #Muda o tipo dos dados do df de string para numerico
 def string_para_numerico(df):
     for coluna in df:
         if coluna == "Data": pass
         else: df[coluna] = pd.to_numeric(df[coluna])
-
-    df["Hora (UTC)"] = df["Hora (UTC)"].apply(lambda x: (x/100)-3)
-    df.rename(columns = {"Hora (UTC)":"Hora (BRT)"}, inplace = True)
-
     return(df)
 
-#Lê o arquvo csv e substitui "," por ".". Chama a função string_para_numerico antes de retornar
-def ler_e_formatar():
-    df = pd.read_csv("arquivos/" + NOME_DO_ARQUIVO + ".csv", sep=";").fillna(0)
-    df = df.replace(',', '.', regex=True)
-    return string_para_numerico(df)
+#Muda o formato do horário militar em UTC para o comum em BRT
+def UTC_para_BRT(df):
+    df["Hora (UTC)"] = df["Hora (UTC)"].apply(lambda x: (x/100)-3)
+    df.rename(columns = {"Hora (UTC)":"Hora (BRT)"}, inplace = True)
+    return df
 
 #Plota um gráfico de linha a partir dos dois eixo dados
 def plot(df, eixo_x="Hora (BRT)", eixo_y="Radiacao (KJ/m²)"):
@@ -37,6 +40,7 @@ def plot(df, eixo_x="Hora (BRT)", eixo_y="Radiacao (KJ/m²)"):
     plt.title(eixo_y+' / '+eixo_x)
     plt.show()
 
+#NÃO USADA
 #Associa valor escolhido com nome da coluna 
 def switch_case(x):
     if x=='0':
@@ -100,28 +104,31 @@ def switch_case(x):
         x='0'
     return x
 
+#NÃO USADA
 #Selecionar as colunas que serão plotadas
 def escolher_eixos_para_plot(df):
-    # while True:
-    #     print('Qual o eixo X deseja plotar? (para ver as opções insira \'0\')\n')
-    #     x=str(input('>'))
-    #     x=switch_case(x)
-    #     if x != '0': break
+    while True:
+        print('Qual o eixo X deseja plotar? (para ver as opções insira \'0\')\n')
+        x=str(input('>'))
+        x=switch_case(x)
+        if x != '0': break
 
-    # while True:
-    #     print('Qual o eixo Y deseja plotar? (para ver as opções insira \'0\')\n')
-    #     y=str(input('>'))
-    #     y=switch_case(y)
-    #     if y != '0': break
+    while True:
+        print('Qual o eixo Y deseja plotar? (para ver as opções insira \'0\')\n')
+        y=str(input('>'))
+        y=switch_case(y)
+        if y != '0': break
 
-    # plot(df, x, y)
-    plot(df)
+    plot(df, x, y)
 
 def main():
 
-    df = ler_e_formatar()
+    df = ler_arquivo()
+    df = string_para_numerico(df)
+    df = UTC_para_BRT(df)
 
-    escolher_eixos_para_plot(df)
+    # escolher_eixos_para_plot(df)
+    plot(df)
 
 if __name__ == "__main__":
     main()
