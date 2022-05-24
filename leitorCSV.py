@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # NOME_DO_ARQUIVO = "GOIANIA (A002)_2022-05-06_2022-05-06"
-NOME_DO_ARQUIVO = "GOIANIA (A002)_2022-05-04_2022-05-11"
+NOME_DO_ARQUIVO = "GOIANIA (A002)_2022-04-01_2022-04-30"
 
 #Lê o arquvo csv e substitui "," por "."
 def ler_arquivo():
@@ -121,14 +121,59 @@ def escolher_eixos_para_plot(df):
 
     plot(df, x, y)
 
+
+def divideDias(df):
+    numDias = len(df)/24
+    listaDias = []
+
+    inicio=0
+    fim=24
+    for dia in range(30):
+        listaDias.append(df.iloc[inicio:fim,:])
+        inicio+=24
+        fim+=24
+    
+    return listaDias
+    
+def mediaDoMes(listaDf):
+    listaMediaHr=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+    for dfDia in listaDf:
+        #print(len(dfDia['Radiacao (KJ/m²)']))
+        for i in range(len(dfDia['Radiacao (KJ/m²)'])):
+            #print('Hora',i,' : ',dfDia.iloc[i]['Radiacao (KJ/m²)'])
+            listaMediaHr[i]+=dfDia.iloc[i]['Radiacao (KJ/m²)']
+        
+    listaMediaHr = [round(x/24, 2) for x in listaMediaHr]
+    return listaMediaHr
+
+def GeraGrafico(mediaMes):
+    hrsDoDia=[]
+    for i in range(24):
+        hrsDoDia.append(i)
+    print(hrsDoDia)
+
+    plt.title('Grafico Media de radiação do Mês') # Titulo 
+    plt.xlabel('Hora (BRT)') # Eixo x 
+    plt.ylabel('Radiacao (KJ/m²)') # Eixo y 
+    plt.plot(hrsDoDia, mediaMes)
+    plt.show()
+
 def main():
 
     df = ler_arquivo()
     df = string_para_numerico(df)
+    
+    dfsEmdias=divideDias(df)
+    mediaMes=mediaDoMes(dfsEmdias)
+    
+    GeraGrafico(mediaMes)
+
+    '''
     df = UTC_para_BRT(df)
 
-    # escolher_eixos_para_plot(df)
-    plot(df)
+    escolher_eixos_para_plot(df)
+    #plot(df)'''
 
 if __name__ == "__main__":
     main()
