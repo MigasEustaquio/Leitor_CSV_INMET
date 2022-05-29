@@ -18,10 +18,16 @@ def string_para_numerico(df):
     return(df)
 
 #Muda o formato do horário militar em UTC para o comum em BRT
-# def UTC_para_BRT(df):
-#     df["Hora (UTC)"] = df["Hora (UTC)"].apply(lambda x: (x/100)-3)
-#     df.rename(columns = {"Hora (UTC)":"Hora (BRT)"}, inplace = True)
-#     return df
+def UTC_para_BRT(df):
+    import datetime
+    
+    df["Hora (UTC)"] = df["Hora (UTC)"].apply(lambda x: int(x/100))
+    df['Hora (UTC)'] = df['Hora (UTC)'].astype(str)
+    df['DateTime (BRT)'] = df['Data'] + '-' + df['Hora (UTC)']
+    df["DateTime (BRT)"] = pd.to_datetime(df['DateTime (BRT)'], format="%d/%m/%Y-%H")
+    df['DateTime (BRT)'] = (df["DateTime (BRT)"] - datetime.timedelta(hours=3)).apply(lambda x: x.strftime('%d/%m/%Y-%H'))
+    
+    return df
 
 #Plota um gráfico de linha a partir dos dois eixo dados
 #NÃO USADA
@@ -173,11 +179,14 @@ def GeraGrafico(mediaMes):
 def main():
 
     df = ler_arquivo()
-    df = string_para_numerico(df)    
-    dfsEmdias=divideDias(df)
+    df = string_para_numerico(df)
 
-    mediaMes=mediaDoMes(dfsEmdias)
-    GeraGrafico(mediaMes)
+    df = UTC_para_BRT(df)
+
+    # dfsEmdias=divideDias(df)
+
+    # mediaMes=mediaDoMes(dfsEmdias)
+    # GeraGrafico(mediaMes)
 
 if __name__ == "__main__":
     main()
