@@ -18,12 +18,13 @@ def string_para_numerico(df):
     return(df)
 
 #Muda o formato do horário militar em UTC para o comum em BRT
-def UTC_para_BRT(df):
-    df["Hora (UTC)"] = df["Hora (UTC)"].apply(lambda x: (x/100)-3)
-    df.rename(columns = {"Hora (UTC)":"Hora (BRT)"}, inplace = True)
-    return df
+# def UTC_para_BRT(df):
+#     df["Hora (UTC)"] = df["Hora (UTC)"].apply(lambda x: (x/100)-3)
+#     df.rename(columns = {"Hora (UTC)":"Hora (BRT)"}, inplace = True)
+#     return df
 
 #Plota um gráfico de linha a partir dos dois eixo dados
+#NÃO USADA
 def plot(df, eixo_x="Hora (BRT)", eixo_y="Radiacao (KJ/m²)"):
 
     # if (df.shape[0]/24) > 50:
@@ -128,7 +129,7 @@ def divideDias(df):
 
     inicio=0
     fim=24
-    for dia in range(30):
+    for dia in range(int(numDias)):
         listaDias.append(df.iloc[inicio:fim,:])
         inicio+=24
         fim+=24
@@ -139,15 +140,25 @@ def mediaDoMes(listaDf):
     listaMediaHr=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
     for dfDia in listaDf:
-        #print(len(dfDia['Radiacao (KJ/m²)']))
         for i in range(len(dfDia['Radiacao (KJ/m²)'])):
-            #print('Hora',i,' : ',dfDia.iloc[i]['Radiacao (KJ/m²)'])
             listaMediaHr[i]+=dfDia.iloc[i]['Radiacao (KJ/m²)']
+        # break
+    
+    # print(listaMediaHr)
         
     listaMediaHr = [round(x/24, 2) for x in listaMediaHr]
     return listaMediaHr
 
 def GeraGrafico(mediaMes):
+
+    novoMediaMes=mediaMes
+    print('Anterior', novoMediaMes)
+    for i in range (3):
+        novoMediaMes.append(novoMediaMes.pop(0))
+    
+    print('Novo', novoMediaMes)
+
+
     hrsDoDia=[]
     for i in range(24):
         hrsDoDia.append(i)
@@ -156,24 +167,17 @@ def GeraGrafico(mediaMes):
     plt.title('Grafico Media de radiação do Mês') # Titulo 
     plt.xlabel('Hora (BRT)') # Eixo x 
     plt.ylabel('Radiacao (KJ/m²)') # Eixo y 
-    plt.plot(hrsDoDia, mediaMes)
+    plt.plot(hrsDoDia, novoMediaMes)
     plt.show()
 
 def main():
 
     df = ler_arquivo()
-    df = string_para_numerico(df)
-    
+    df = string_para_numerico(df)    
     dfsEmdias=divideDias(df)
+
     mediaMes=mediaDoMes(dfsEmdias)
-    
     GeraGrafico(mediaMes)
-
-    '''
-    df = UTC_para_BRT(df)
-
-    escolher_eixos_para_plot(df)
-    #plot(df)'''
 
 if __name__ == "__main__":
     main()
