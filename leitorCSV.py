@@ -176,17 +176,41 @@ def GeraGrafico(mediaMes):
     plt.plot(hrsDoDia, novoMediaMes)
     plt.show()
 
+def mediaDia(df, label):
+    mediaHoras=[]
+    for i in range(24):
+        if (i<10):
+            hora='-0'+str(i)
+        else:
+            hora='-'+str(i)
+        valoresDia = df[df['DateTime (BRT)'].str.endswith(hora)][label].values
+        mediaHoras.append(round(sum(valoresDia)/len(valoresDia),1))
+    
+    # h=0
+    # for i in mediaHoras:
+    #     print('hora '+str(h)+': ',i)
+    #     h+=1
+    
+    return mediaHoras
+
+def geraGrafico(eixoX, legendaX, eixoY, legendaY, titulo):
+    plt.title(titulo) # Titulo 
+    plt.xlabel(legendaX) # Eixo x 
+    plt.ylabel(legendaY) # Eixo y 
+    plt.plot(eixoY, eixoX)
+    plt.show()
+
 def main():
 
     df = ler_arquivo()
     df = string_para_numerico(df)
-
     df = UTC_para_BRT(df)
 
-    # dfsEmdias=divideDias(df)
-
-    # mediaMes=mediaDoMes(dfsEmdias)
-    # GeraGrafico(mediaMes)
+    dfMediaDia=mediaDia(df, 'Radiacao (KJ/m²)')
+    horasDoDia=[]
+    for i in range(24):
+        horasDoDia.append(i)
+    geraGrafico(dfMediaDia, 'Radiação (KJ/m²)', horasDoDia, 'Hora (BRT)', 'Gráfico da radiaçã média o do Mês')
 
 if __name__ == "__main__":
     main()
