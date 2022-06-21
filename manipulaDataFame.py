@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import datetime
 
 #Muda o tipo dos dados do df de string para numerico
@@ -15,8 +16,9 @@ def UTC_para_BRT(df):
     df['Hora (UTC)'] = df['Hora (UTC)'].astype(str)
     df['DateTime (BRT)'] = df['Data'] + '-' + df['Hora (UTC)']
     df["DateTime (BRT)"] = pd.to_datetime(df['DateTime (BRT)'], format="%d/%m/%Y-%H")
+    df['Date (BRT)'] = (df["DateTime (BRT)"] - datetime.timedelta(hours=3)).apply(lambda x: x.strftime('%d/%m/%Y'))
     df['DateTime (BRT)'] = (df["DateTime (BRT)"] - datetime.timedelta(hours=3)).apply(lambda x: x.strftime('%d/%m/%Y-%H'))
-    
+
     return df
 
 def mediaDia(df, label):
@@ -42,7 +44,7 @@ def KJ_to_KWh(df):
 #media no dia, descarta valores nulos
 def meidaDiaNotNull(df, label, data):
     valoresValidos=[]
-    valores=df[df['Data'].str.match(data)][label].values
+    valores=df[df['Date (BRT)'].str.match(data)][label].values
 
     for valor in valores:
         if valor != 0:
@@ -53,6 +55,32 @@ def meidaDiaNotNull(df, label, data):
     return media
 
 def listaDias(df):
-    dias = df['Data'].values
+    dias = df['Date (BRT)'].values
     listaDias=list(set(dias))
-    return sorted(listaDias)
+    return sorted(listaDias, key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y"))
+
+def separar_dataframes(df):
+
+    dias = df['DateTime (BRT)'].values
+    meses_e_indicesDF={}
+    dicionario_de_meses={}
+
+    for index, dia in enumerate(dias):
+        if dia.startswith('01') and dia.endswith('00'):
+            nomeDia=dia.split('-')[0]
+            meses_e_indicesDF[nomeDia.split('/')[1]+'/'+nomeDia.split('/')[2]]=index
+
+    dfs=np.split(df, meses_e_indicesDF.values(), axis=0)
+
+    data_celula_resto = dfs[0].at[0, 'DateTime (BRT)'].split('-')[0]
+    data_celula_resto = data_celula_resto.split('/')[1]+'/'+data_celula_resto.split('/')[2]
+
+    if data_celula_resto not in meses_e_indicesDF:
+        meses_e_indicesDF[data_celula_resto] = dfs[0]
+
+    meses_e_indicesDF=sorted(meses_e_indicesDF.keys())
+
+    for i, mes in enumerate(meses_e_indicesDF):
+        dicionario_de_meses[mes] = dfs[i]
+
+    return dicionario_de_meses
