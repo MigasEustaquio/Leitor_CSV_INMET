@@ -50,9 +50,12 @@ def meidaDiaNotNull(df, label, data):
         if valor != 0:
             valoresValidos.append(valor)
 
-    media =  sum(valoresValidos)/len(valoresValidos)
+    # media =  sum(valoresValidos)/len(valoresValidos)
     
-    return media
+    if len(valoresValidos) == 0:
+        return 0
+    else:
+        return sum(valoresValidos)/len(valoresValidos)
 
 def listaDias(df):
     dias = df['Date (BRT)'].values
@@ -60,27 +63,33 @@ def listaDias(df):
     return sorted(listaDias, key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y"))
 
 def separar_dataframes(df):
-
+    mes_e_ano=''
     dias = df['DateTime (BRT)'].values
     meses_e_indicesDF={}
     dicionario_de_meses={}
 
     for index, dia in enumerate(dias):
-        if dia.startswith('01') and dia.endswith('00'):
-            nomeDia=dia.split('-')[0]
-            meses_e_indicesDF[nomeDia.split('/')[1]+'/'+nomeDia.split('/')[2]]=index
+        nomeDia=dia.split('-')[0]
+        mes_e_ano=nomeDia.split('/')[1]+'/'+nomeDia.split('/')[2]
 
-    dfs=np.split(df, meses_e_indicesDF.values(), axis=0)
+        if index==0:
+            meses_e_indicesDF[mes_e_ano]=index
+            mes_anterior=mes_e_ano
+        else:
+            if mes_e_ano != mes_anterior:
+                meses_e_indicesDF[mes_e_ano]=index
+                mes_anterior=mes_e_ano
 
-    data_celula_resto = dfs[0].at[0, 'DateTime (BRT)'].split('-')[0]
-    data_celula_resto = data_celula_resto.split('/')[1]+'/'+data_celula_resto.split('/')[2]
-
-    if data_celula_resto not in meses_e_indicesDF:
-        meses_e_indicesDF[data_celula_resto] = dfs[0]
+    dfs=np.split(df, list(meses_e_indicesDF.values())[1:], axis=0)
 
     meses_e_indicesDF=sorted(meses_e_indicesDF.keys())
 
     for i, mes in enumerate(meses_e_indicesDF):
         dicionario_de_meses[mes] = dfs[i]
 
+    # print(dicionario_de_meses)
+
     return dicionario_de_meses
+
+def concatenar_dfs(dfs):
+    return pd.concat(dfs)
