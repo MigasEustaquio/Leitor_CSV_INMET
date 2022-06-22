@@ -1,49 +1,91 @@
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 
 
-def divideDias(df):
-    numDias = len(df)/24
-    listaDias = []
+# def divideDias(df):
+#     numDias = len(df)/24
+#     listaDias = []
 
-    inicio=0
-    fim=24
-    for dia in range(int(numDias)):
-        listaDias.append(df.iloc[inicio:fim,:])
-        inicio+=24
-        fim+=24
+#     inicio=0
+#     fim=24
+#     for dia in range(int(numDias)):
+#         listaDias.append(df.iloc[inicio:fim,:])
+#         inicio+=24
+#         fim+=24
     
-    return listaDias
+#     return listaDias
     
-def mediaDoMes(listaDf):
-    listaMediaHr=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+# def mediaDoMes(listaDf):
+#     listaMediaHr=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
-    for dfDia in listaDf:
-        for i in range(len(dfDia['Radiacao (KJ/m²)'])):
-            listaMediaHr[i]+=dfDia.iloc[i]['Radiacao (KJ/m²)']
-        # break
+#     for dfDia in listaDf:
+#         for i in range(len(dfDia['Radiacao (KJ/m²)'])):
+#             listaMediaHr[i]+=dfDia.iloc[i]['Radiacao (KJ/m²)']
+#         # break
     
-    # print(listaMediaHr)
+#     # print(listaMediaHr)
         
-    listaMediaHr = [round(x/24, 2) for x in listaMediaHr]
-    return listaMediaHr
+#     listaMediaHr = [round(x/24, 2) for x in listaMediaHr]
+#     return listaMediaHr
 
-def GeraGrafico(mediaMes):
+# def GeraGrafico(mediaMes):
 
-    novoMediaMes=mediaMes
-    print('Anterior', novoMediaMes)
-    for i in range (3):
-        novoMediaMes.append(novoMediaMes.pop(0))
+#     novoMediaMes=mediaMes
+#     print('Anterior', novoMediaMes)
+#     for i in range (3):
+#         novoMediaMes.append(novoMediaMes.pop(0))
     
-    print('Novo', novoMediaMes)
+#     print('Novo', novoMediaMes)
 
 
-    hrsDoDia=[]
-    for i in range(24):
-        hrsDoDia.append(i)
-    print(hrsDoDia)
+#     hrsDoDia=[]
+#     for i in range(24):
+#         hrsDoDia.append(i)
+#     print(hrsDoDia)
 
-    plt.title('Grafico Media de radiação do Mês') # Titulo 
-    plt.xlabel('Hora (BRT)') # Eixo x 
-    plt.ylabel('Radiacao (KJ/m²)') # Eixo y 
-    plt.plot(hrsDoDia, novoMediaMes)
-    plt.show()
+#     plt.title('Grafico Media de radiação do Mês') # Titulo 
+#     plt.xlabel('Hora (BRT)') # Eixo x 
+#     plt.ylabel('Radiacao (KJ/m²)') # Eixo y 
+#     plt.plot(hrsDoDia, novoMediaMes)
+#     plt.show()
+
+import pandas as pd
+import plotly.graph_objs as go
+import plotly.offline as py
+
+def graficoBonito():
+    # Gráfico usando apenas marcadores
+    trace1 = go.Scatter(x = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio'],
+                        y = [1, 2, 3, 4, 5],
+                        mode = 'markers',
+                        name = 'Apenas marcadores')
+    # Gráfico de apenas linhas
+    trace2 = go.Scatter(x = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio'],
+                        y = [11, 12, 13, 14, 15],
+                        mode = 'lines',
+                        name = 'Apenas linhas')
+    # Criando gráfico com marcadores e linhas
+    trace3 = go.Scatter(x = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio'],
+                        y = [6, 7, 8, 9, 10],
+                        mode = 'markers+lines',
+                        name = 'Marcadores e Linhas')
+    data = [trace1, trace2, trace3]
+    py.iplot(data)
+
+def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
+    # plt.title(titulo) # Titulo 
+    # plt.xlabel(legendaX) # Eixo x 
+    # plt.ylabel(legendaY) # Eixo y 
+    # plt.plot(eixoX, eixoY)
+    # plt.show()
+    max_value = max(eixoY)
+    idx_max_value= eixoY.index(max_value)
+   
+    layout = go.Layout(title=titulo, yaxis={'title':legendaY},xaxis={'title': legendaX})
+    grafico = go.Scatter(x = eixoX, y = eixoY, mode = 'markers+lines', name = titulo)
+    fig = go.Figure(data=grafico, layout=layout)
+    fig.add_trace(go.Scatter(x=[eixoX[idx_max_value]], y=[max_value], mode = 'markers', marker_symbol = 'x', marker_size = 10, name = 'Valor Máximo'))
+    py.iplot(fig)
+    
+
+#graficoBonito()
+

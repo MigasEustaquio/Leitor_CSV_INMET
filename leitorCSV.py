@@ -1,6 +1,7 @@
 from dataView import geraGrafico
 from manipulaAquivo import ler_arquivos
 from manipulaDataFame import *
+from tests import geraGraficoBonito
 
 def main():
 
@@ -12,22 +13,26 @@ def main():
     df = addTempMedia(df)
     df = KJ_to_KWh(df)
 
+    print(df)
+
     dicionario_de_meses = separar_dataframes(df)
 
-    print(dicionario_de_meses)
+    # for i in dicionario_de_meses:
+    #     print('Referencia: ',i,'\n',dicionario_de_meses[i])
+    
 
-    dias = listaDias(dicionario_de_meses['03/2022'])
+    # dias = listaDias(dicionario_de_meses['03/2022'])
 
-    for dia in dias:
-        media = meidaDiaNotNull(df, 'Radiacao (Jh/m²)', dia)
-        if media==0:
-            print(dia, ' Dados insuficientes')
-        else:
-            print (dia, f' Incidencia média: {media:.3f} Jh/m²')
+    # for dia in dias:
+    #     media = meidaDiaNotNull(df, 'Radiacao (Jh/m²)', dia)
+    #     if media==0:
+    #         print(dia, ' Dados insuficientes')
+    #     else:
+    #         print (dia, f' Incidencia média: {media:.3f} Jh/m²')
 
 
-    mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses['03/2022'], 'Radiacao (Jh/m²)')
-    geraGrafico(horasDoDia, 'Hora (BRT)', mediaPorHora, 'Radiacao (Jh/m²)', 'Gráfico da radiaçã média o do Mês')
+    mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses['04/2022'], 'Radiacao (Jh/m²)')
+    geraGraficoBonito(horasDoDia, 'Hora (BRT)', mediaPorHora, 'Radiacao (Jh/m²)', 'Gráfico da radiação média o do Mês')
 
 
 if __name__ == "__main__":
