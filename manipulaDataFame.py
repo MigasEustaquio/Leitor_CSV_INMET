@@ -23,15 +23,18 @@ def UTC_para_BRT(df):
 
 def mediaDia(df, label):
     mediaHoras=[]
+    horasDoDia=[]
     for i in range(24):
         if (i<10):
             hora='-0'+str(i)
         else:
             hora='-'+str(i)
         valoresDia = df[df['DateTime (BRT)'].str.endswith(hora)][label].values
-        mediaHoras.append(round(sum(valoresDia)/len(valoresDia),1))
+        if(len(valoresDia)>0):
+            mediaHoras.append(round(sum(valoresDia)/len(valoresDia),3))
+            horasDoDia.append(i)
     
-    return mediaHoras
+    return mediaHoras,horasDoDia
 
 def addTempMedia(df):
     df['Temp. Med. (C)'] = (df['Temp. Min. (C)'].values + df['Temp. Max. (C)'].values)/2
