@@ -1,7 +1,6 @@
-from dataView import geraGrafico
+from dataView import *
 from manipulaAquivo import ler_arquivos
 from manipulaDataFame import *
-from tests import geraGraficoBonito
 
 NOMES_ARQUIVOS=['GOIANIA (A002)_2022-04-01_2022-04-30']
 MES_DE_REFERENCIA='04/2022'
@@ -27,7 +26,7 @@ def main():
 
 
     mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses[MES_DE_REFERENCIA], 'Radiacao (Jh/m²)')
-    geraGraficoBonito(horasDoDia, 'Hora (BRT)', mediaPorHora, 'Radiacao (Jh/m²)', 'Gráfico da radiação média o do Mês')
+    geraGraficoBonito(horasDoDia, 'Hora (BRT)', mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação média o do Mês')
 
 def radiacaoMediaValida(df, dicionario_de_meses, mes):
     dias = listaDias(dicionario_de_meses[mes])

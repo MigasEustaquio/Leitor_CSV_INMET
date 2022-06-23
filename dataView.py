@@ -1,4 +1,7 @@
 import matplotlib.pyplot as plt
+import plotly.graph_objs as go
+import plotly.offline as py
+import numpy as np
 
 #Plota um gráfico de linha a partir dos parametros passados
 def geraGrafico(eixoX, legendaX, eixoY, legendaY, titulo):
@@ -7,6 +10,26 @@ def geraGrafico(eixoX, legendaX, eixoY, legendaY, titulo):
     plt.ylabel(legendaY) # Eixo y 
     plt.plot(eixoX, eixoY)
     plt.show()
+
+#Plota gráfico utilizando recursos da biblioteca plotly
+def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
+    max_value = max(eixoY)
+    indx_max_values = np.where(eixoY == max_value)
+    max_values = [max_value]*len(indx_max_values[0])
+
+    min_value = min(eixoY)
+    indx_min_values= np.where(eixoY == min_value)
+    min_values=[min_value]*len(indx_min_values[0])
+    
+   
+    layout = go.Layout(title=titulo, yaxis={'title':legendaY},xaxis={'title': legendaX})
+    grafico = go.Scatter(x = eixoX, y = eixoY, mode = 'markers+lines', line=dict(color='rgb(0,0,0)'), name = titulo)
+
+    fig = go.Figure(data=grafico, layout=layout)
+    fig.add_trace(go.Scatter(x = indx_max_values[0], y = max_values, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(color='rgb(0,0,255)',size=10),name = 'Valor Máximo'))
+    fig.add_trace(go.Scatter(x = indx_min_values[0], y = min_values, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(color='rgb(255,0,0)',size=10), name = 'Valor Mínimo'))
+
+    py.plot(fig)
 
 #Plota um gráfico de linha a partir dos dois eixo dados
 #NÃO USADA

@@ -51,6 +51,7 @@
 import pandas as pd
 import plotly.graph_objs as go
 import plotly.offline as py
+import numpy as np
 
 def graficoBonito():
     # Gráfico usando apenas marcadores
@@ -69,23 +70,7 @@ def graficoBonito():
                         mode = 'markers+lines',
                         name = 'Marcadores e Linhas')
     data = [trace1, trace2, trace3]
-    py.iplot(data)
-
-def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
-    # plt.title(titulo) # Titulo 
-    # plt.xlabel(legendaX) # Eixo x 
-    # plt.ylabel(legendaY) # Eixo y 
-    # plt.plot(eixoX, eixoY)
-    # plt.show()
-    max_value = max(eixoY)
-    idx_max_value= eixoY.index(max_value)
-   
-    layout = go.Layout(title=titulo, yaxis={'title':legendaY},xaxis={'title': legendaX})
-    grafico = go.Scatter(x = eixoX, y = eixoY, mode = 'markers+lines', name = titulo)
-    fig = go.Figure(data=grafico, layout=layout)
-    fig.add_trace(go.Scatter(x=[eixoX[idx_max_value]], y=[max_value], mode = 'markers', marker_symbol = 'x', marker_size = 10, name = 'Valor Máximo'))
-    py.iplot(fig)
-    
+    py.plot(data)
 
 #graficoBonito()
 
