@@ -2,37 +2,37 @@ from dataView import *
 from manipulaAquivo import ler_arquivos
 from manipulaDataFame import *
 
-NOMES_ARQUIVOS=['GOIANIA (A002)_2022-05-01_2022-05-31', 'GOIANIA (A002)_2022-04-01_2022-04-30']
+NOMES_ARQUIVOS=[ 'GOIANIA (A002)_2022-05-01_2022-05-31', 'GOIANIA (A002)_2022-04-01_2022-04-30']
 MES_DE_REFERENCIA='04/2022'
+FUSO_HORARIO='-3'
 def main():
 
-    # df = ler_arquivo('arquivos/','GOIANIA (A002)_2022-04-01_2022-04-30')
     dfs = ler_arquivos('arquivos/',NOMES_ARQUIVOS)
     df = concatenar_dfs(dfs)
     df = string_para_numerico(df)
-    df = UTC_para_BRT(df)
+    df = definir_fuso_horario(df, FUSO_HORARIO)
     df = addTempMedia(df)
     df = KJ_to_KWh(df)
 
-    print(df)
+    print('COMPLETO ',df)
 
-    dicionario_de_meses = separar_dataframes(df)
+    dicionario_de_meses = separar_dataframes(df, FUSO_HORARIO)
+    print(dicionario_de_meses)
 
-    for i in dicionario_de_meses:
-        print('Referencia: ',i)
+    # print(list(dicionario_de_meses.keys()))
     
 
     # radiacaoMediaValida(df, dicionario_de_meses, MES_DE_REFERENCIA)
 
-
-    # mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses[MES_DE_REFERENCIA], 'Radiacao (Jh/m²)')
-    # geraGraficoBonito(horasDoDia, 'Hora (BRT)', mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação média o do Mês')
+    # print(dicionario_de_meses[MES_DE_REFERENCIA])
+    # mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses[MES_DE_REFERENCIA], 'Radiacao (Jh/m²)', FUSO_HORARIO)
+    # #geraGraficoBonito(horasDoDia, 'Hora (BRT)', mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação média o do Mês')
 
 def radiacaoMediaValida(df, dicionario_de_meses, mes):
-    dias = listaDias(dicionario_de_meses[mes])
+    dias = listaDias(dicionario_de_meses[mes], FUSO_HORARIO)
 
     for dia in dias:
-        media = mediaDiaNotNull(df, 'Radiacao (Jh/m²)', dia)
+        media = mediaDiaNotNull(df, 'Radiacao (Jh/m²)', dia, FUSO_HORARIO)
         if media==0:
             print(dia, ' Dados insuficientes')
         else:

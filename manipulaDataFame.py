@@ -21,15 +21,47 @@ def UTC_para_BRT(df):
 
     return df
 
-def mediaDia(df, label):
+
+def definir_fuso_horario(df, fuso):
+
+    df["Hora (UTC)"] = df["Hora (UTC)"].apply(lambda x: int(x/100))
+    df['Hora (UTC)'] = df['Hora (UTC)'].astype(str)
+
+    fuso=list(fuso.replace(' ', ''))
+
+    if len(fuso)>2: fuso[1]+=fuso[2]
+
+    formato_fuso='(UTC'+fuso[0]+fuso[1]+')'
+    date='Date '+formato_fuso
+    date_time = 'DateTime '+formato_fuso
+
+    df[date_time] = df['Data'] + '-' + df['Hora (UTC)']
+    df[date_time] = pd.to_datetime(df[date_time], format="%d/%m/%Y-%H")
+
+    if fuso[0] == '+':
+        df[date] = (df[date_time] + datetime.timedelta(hours=int(fuso[1]))).apply(lambda x: x.strftime('%d/%m/%Y'))
+        df[date_time] = (df[date_time] + datetime.timedelta(hours=int(fuso[1]))).apply(lambda x: x.strftime('%d/%m/%Y-%H'))
+    else:
+        df[date] = (df[date_time] - datetime.timedelta(hours=int(fuso[1]))).apply(lambda x: x.strftime('%d/%m/%Y'))
+        df[date_time] = (df[date_time] - datetime.timedelta(hours=int(fuso[1]))).apply(lambda x: x.strftime('%d/%m/%Y-%H'))
+
+    return df
+
+
+def mediaDia(df, label, fuso):
     mediaHoras=[]
     horasDoDia=[]
+
+    if len(fuso)>2: fuso[1]+=fuso[2]
+
+    formato_fuso='(UTC'+fuso[0]+fuso[1]+')'
+
     for i in range(24):
         if (i<10):
             hora='-0'+str(i)
         else:
             hora='-'+str(i)
-        valoresDia = df[df['DateTime (BRT)'].str.endswith(hora)][label].values
+        valoresDia = df[df['DateTime '+formato_fuso].str.endswith(hora)][label].values
         if(len(valoresDia)>0):
             mediaHoras.append(round(sum(valoresDia)/len(valoresDia),3))
             horasDoDia.append(i)
@@ -45,9 +77,14 @@ def KJ_to_KWh(df):
     return df
 
 #media no dia, descarta valores nulos
-def mediaDiaNotNull(df, label, data):
+def mediaDiaNotNull(df, label, data, fuso):
     valoresValidos=[]
-    valores=df[df['Date (BRT)'].str.match(data)][label].values
+
+    if len(fuso)>2: fuso[1]+=fuso[2]
+
+    formato_fuso='(UTC'+fuso[0]+fuso[1]+')'
+
+    valores=df[df['Date '+formato_fuso].str.match(data)][label].values
 
     for valor in valores:
         if valor != 0:
@@ -60,14 +97,24 @@ def mediaDiaNotNull(df, label, data):
     else:
         return sum(valoresValidos)/len(valoresValidos)
 
-def listaDias(df):
-    dias = df['Date (BRT)'].values
+def listaDias(df, fuso):
+
+    if len(fuso)>2: fuso[1]+=fuso[2]
+
+    formato_fuso='(UTC'+fuso[0]+fuso[1]+')'
+
+    dias = df['Date '+formato_fuso].values
     listaDias=list(set(dias))
     return sorted(listaDias, key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y"))
 
-def separar_dataframes(df):
+def separar_dataframes(df, fuso):
     mes_e_ano=''
-    dias = df['DateTime (BRT)'].values
+
+    if len(fuso)>2: fuso[1]+=fuso[2]
+
+    formato_fuso='(UTC'+fuso[0]+fuso[1]+')'
+
+    dias = df['DateTime '+formato_fuso].values
     meses_e_indicesDF={}
     dicionario_de_meses={}
 
@@ -94,6 +141,5 @@ def separar_dataframes(df):
 
 def concatenar_dfs(dfs):
     fullDf=pd.concat(dfs)
-    print(type(fullDf))
     fullDf = fullDf.sort_values(by=['Data', 'Hora (UTC)'])
     return fullDf
