@@ -28,7 +28,7 @@ python3 leitorCSV.py
 <table>
   <tr>
     <td align="center">
-      <a href="#">
+      <a href="https://github.com/carlosrvilela">
         <img src="https://avatars.githubusercontent.com/u/50680051?v=4" width="100px;" alt="Foto do Carlos Vilela no GitHub"/><br>
         <sub>
           <b>Carlos Vilela</b>
@@ -36,7 +36,7 @@ python3 leitorCSV.py
       </a>
     </td>
     <td align="center">
-      <a href="#">
+      <a href="https://github.com/MigasEustaquio">
         <img src="https://avatars.githubusercontent.com/u/31831761?v=4" width="100px;" alt="Foto do Miguel Eustáquio no GitHub"/><br>
         <sub>
           <b>Miguel Eustáquio</b>
