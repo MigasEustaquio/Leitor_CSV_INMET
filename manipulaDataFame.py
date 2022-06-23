@@ -45,7 +45,7 @@ def KJ_to_KWh(df):
     return df
 
 #media no dia, descarta valores nulos
-def meidaDiaNotNull(df, label, data):
+def mediaDiaNotNull(df, label, data):
     valoresValidos=[]
     valores=df[df['Date (BRT)'].str.match(data)][label].values
 
