@@ -3,10 +3,11 @@ from manipulaAquivo import ler_arquivos
 from manipulaDataFame import *
 from tests import geraGraficoBonito
 
+NOMES_ARQUIVOS = ['GOIANIA (A002)_2022-04-01_2022-04-30']
+
 def main():
 
-    # df = ler_arquivo('arquivos/','GOIANIA (A002)_2022-04-01_2022-04-30')
-    dfs = ler_arquivos('arquivos/',['GOIANIA (A002)_2022-04-01_2022-04-30'])
+    dfs = ler_arquivos('arquivos/', NOMES_ARQUIVOS)
     df = concatenar_dfs(dfs)
     df = string_para_numerico(df)
     df = UTC_para_BRT(df)
