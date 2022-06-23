@@ -90,9 +90,10 @@ def separar_dataframes(df):
     for i, mes in enumerate(meses_e_indicesDF):
         dicionario_de_meses[mes] = dfs[i]
 
-    # print(dicionario_de_meses)
-
     return dicionario_de_meses
 
 def concatenar_dfs(dfs):
-    return pd.concat(dfs)
+    fullDf=pd.concat(dfs)
+    print(type(fullDf))
+    fullDf = fullDf.sort_values(by=['Data', 'Hora (UTC)'])
+    return fullDf
