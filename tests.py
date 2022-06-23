@@ -70,7 +70,15 @@ def graficoBonito():
                         mode = 'markers+lines',
                         name = 'Marcadores e Linhas')
     data = [trace1, trace2, trace3]
-    py.plot(data)
+    py.plot(data, auto_open=False)
 
-#graficoBonito()
 
+import test_screenView as testSV
+
+def test():
+
+    testSV.main()
+
+if __name__ == '__main__':
+
+    test()
