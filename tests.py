@@ -74,10 +74,20 @@ def graficoBonito():
 
 
 import test_screenView as testSV
+from manipulaDataFame import *
+from manipulaAquivo import *
 
 def test():
 
-    testSV.main()
+    # dfs = ler_arquivos('arquivos/',['GOIANIA (A002)_2022-04-01_2022-04-30'])
+    # df = concatenar_dfs(dfs)
+    # df = string_para_numerico(df)
+
+    # df = definir_fuso_horario(df, '-5')
+
+    # print(df)
+
+    graficoBonito()
 
 if __name__ == '__main__':
 
