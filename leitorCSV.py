@@ -14,10 +14,10 @@ def main():
     df = addTempMedia(df)
     df = KJ_to_KWh(df)
 
-    print('COMPLETO ',df)
+    # print('COMPLETO ',df)
 
     dicionario_de_meses = separar_dataframes(df, FUSO_HORARIO)
-    print(dicionario_de_meses)
+    # print(dicionario_de_meses)
 
     # print(list(dicionario_de_meses.keys()))
     
@@ -25,8 +25,8 @@ def main():
     # radiacaoMediaValida(df, dicionario_de_meses, MES_DE_REFERENCIA)
 
     # print(dicionario_de_meses[MES_DE_REFERENCIA])
-    # mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses[MES_DE_REFERENCIA], 'Radiacao (Jh/m²)', FUSO_HORARIO)
-    # #geraGraficoBonito(horasDoDia, 'Hora (BRT)', mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação média o do Mês')
+    mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses[MES_DE_REFERENCIA], 'Radiacao (Jh/m²)', FUSO_HORARIO)
+    geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+FUSO_HORARIO+')' , mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação média o do Mês')
 
 def radiacaoMediaValida(df, dicionario_de_meses, mes):
     dias = listaDias(dicionario_de_meses[mes], FUSO_HORARIO)

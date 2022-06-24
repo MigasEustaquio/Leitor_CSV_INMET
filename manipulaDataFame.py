@@ -37,6 +37,7 @@ def definir_fuso_horario(df, fuso):
 
     df[date_time] = df['Data'] + '-' + df['Hora (UTC)']
     df[date_time] = pd.to_datetime(df[date_time], format="%d/%m/%Y-%H")
+    df = df.sort_values(by=[date_time])
 
     if fuso[0] == '+':
         df[date] = (df[date_time] + datetime.timedelta(hours=int(fuso[1]))).apply(lambda x: x.strftime('%d/%m/%Y'))
@@ -52,9 +53,7 @@ def mediaDia(df, label, fuso):
     mediaHoras=[]
     horasDoDia=[]
 
-    if len(fuso)>2: fuso[1]+=fuso[2]
-
-    formato_fuso='(UTC'+fuso[0]+fuso[1]+')'
+    formato_fuso='(UTC'+fuso+')'
 
     for i in range(24):
         if (i<10):
@@ -80,9 +79,7 @@ def KJ_to_KWh(df):
 def mediaDiaNotNull(df, label, data, fuso):
     valoresValidos=[]
 
-    if len(fuso)>2: fuso[1]+=fuso[2]
-
-    formato_fuso='(UTC'+fuso[0]+fuso[1]+')'
+    formato_fuso='(UTC'+fuso+')'
 
     valores=df[df['Date '+formato_fuso].str.match(data)][label].values
 
@@ -99,9 +96,7 @@ def mediaDiaNotNull(df, label, data, fuso):
 
 def listaDias(df, fuso):
 
-    if len(fuso)>2: fuso[1]+=fuso[2]
-
-    formato_fuso='(UTC'+fuso[0]+fuso[1]+')'
+    formato_fuso='(UTC'+fuso+')'
 
     dias = df['Date '+formato_fuso].values
     listaDias=list(set(dias))
@@ -110,17 +105,14 @@ def listaDias(df, fuso):
 def separar_dataframes(df, fuso):
     mes_e_ano=''
 
-    if len(fuso)>2: fuso[1]+=fuso[2]
+    formato_fuso='(UTC'+fuso+')'
 
-    formato_fuso='(UTC'+fuso[0]+fuso[1]+')'
-
-    dias = df['DateTime '+formato_fuso].values
+    dias = df['Date '+formato_fuso].values
     meses_e_indicesDF={}
     dicionario_de_meses={}
 
     for index, dia in enumerate(dias):
-        nomeDia=dia.split('-')[0]
-        mes_e_ano=nomeDia.split('/')[1]+'/'+nomeDia.split('/')[2]
+        mes_e_ano=dia.split('/')[1]+'/'+dia.split('/')[2]
 
         if index==0:
             meses_e_indicesDF[mes_e_ano]=index
@@ -129,7 +121,7 @@ def separar_dataframes(df, fuso):
             if mes_e_ano != mes_anterior:
                 meses_e_indicesDF[mes_e_ano]=index
                 mes_anterior=mes_e_ano
-
+    # print(meses_e_indicesDF)
     dfs=np.split(df, list(meses_e_indicesDF.values())[1:], axis=0)
 
     meses_e_indicesDF=sorted(meses_e_indicesDF.keys())
@@ -141,5 +133,5 @@ def separar_dataframes(df, fuso):
 
 def concatenar_dfs(dfs):
     fullDf=pd.concat(dfs)
-    fullDf = fullDf.sort_values(by=['Data', 'Hora (UTC)'])
+    # fullDf = fullDf.sort_values(by=['Data', 'Hora (UTC)'])
     return fullDf

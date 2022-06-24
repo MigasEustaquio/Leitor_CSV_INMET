@@ -3,6 +3,8 @@ from tkinter import filedialog
 import pandas as pd
 
 from manipulaDataFame import *
+from dataView import *
+import test_screenView as tSV
 
 
 def getFiles(fullpaths):
@@ -65,8 +67,8 @@ class GraphicInterface(object):
         self.screen.mainloop()
     
     def define_fuso_horario(self):
-            self.fuso=self.entryFuso.get()
-            print(self.fuso)
+        self.fuso=self.entryFuso.get()
+        print(self.fuso)
 
     def selectFile(self):
         fileNames=filedialog.askopenfilenames(filetypes=[("CSV files", ".csv")])
@@ -83,13 +85,9 @@ class GraphicInterface(object):
         self.dataFrame = getFiles(fileNames)
         self.dataFrame = concatenar_dfs(self.dataFrame)
         self.dataFrame = string_para_numerico(self.dataFrame)
-        # self.dataFrame = UTC_para_BRT(self.dataFrame)
         self.dataFrame = definir_fuso_horario(self.dataFrame, self.fuso)
         self.dataFrame = addTempMedia(self.dataFrame)
         self.dataFrame = KJ_to_KWh(self.dataFrame)
-
-        print(self.dataFrame)
-        
 
     def formatText(self, fileNames):
         finalText=''
@@ -99,11 +97,12 @@ class GraphicInterface(object):
 
 
     def splitDataFrame(self):
-        self.dataFrames = separar_dataframes(self.dataFrame)
+        self.dataFrames = separar_dataframes(self.dataFrame, self.fuso)
 
         btns=[]
         for mes in list(self.dataFrames.keys()):
             btn = Button(self.screen, text = mes)
+            # btn = Button(self.screen, text = mes, command= lambda: self.gerar_grafico(btn['text']))
             btns.append(btn)
         for i, j in enumerate(btns):
             j.grid(column=self.infoSplitDataFrameButton["column"], row=self.infoSplitDataFrameButton["row"]+i+1)
@@ -119,6 +118,13 @@ class GraphicInterface(object):
             self.labelNomesDosArquivos.grid_forget()
             self.hidenLabelButton["text"] = 'Mostrar'
         
+    def gerar_grafico(self, mes_referencia): #em teste
+        print(mes_referencia)
+        mediaPorHora, horasDoDia = mediaDia(self.dataFrames[mes_referencia], 'Radiacao (Jh/m²)', self.fuso)
+        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação média o do Mês')
+        tSV.main()
+
+
 	  
  
 GraphicInterface()

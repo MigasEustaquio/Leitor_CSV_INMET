@@ -79,13 +79,15 @@ from manipulaAquivo import *
 
 def test():
 
-    dfs = ler_arquivos('arquivos/',['GOIANIA (A002)_2022-04-01_2022-04-30'])
-    df = concatenar_dfs(dfs)
-    df = string_para_numerico(df)
+    # dfs = ler_arquivos('arquivos/',['GOIANIA (A002)_2022-04-01_2022-04-30'])
+    # df = concatenar_dfs(dfs)
+    # df = string_para_numerico(df)
 
-    df = definir_fuso_horario(df, '-5')
+    # df = definir_fuso_horario(df, '-5')
 
-    print(df)
+    # print(df)
+
+    graficoBonito()
 
 if __name__ == '__main__':
 

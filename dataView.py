@@ -29,7 +29,7 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
     fig.add_trace(go.Scatter(x = indx_max_values[0], y = max_values, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(color='rgb(0,0,255)',size=10),name = 'Valor Máximo'))
     fig.add_trace(go.Scatter(x = indx_min_values[0], y = min_values, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(color='rgb(255,0,0)',size=10), name = 'Valor Mínimo'))
 
-    py.plot(fig)
+    py.plot(fig, auto_open=False)
 
 #Plota um gráfico de linha a partir dos dois eixo dados
 #NÃO USADA
