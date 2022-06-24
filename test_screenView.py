@@ -13,7 +13,6 @@ WindowUtils = cef.WindowUtils()
 # Platforms
 WINDOWS = (platform.system() == "Windows")
 LINUX = (platform.system() == "Linux")
-MAC = (platform.system() == "Darwin")
 
 # Globals
 logger = _logging.getLogger("tkinter_.py")
@@ -25,9 +24,10 @@ IMAGE_EXT = ".png" if tk.TkVersion > 8.5 else ".gif"
 
 class MainFrame(tk.Frame):
 
-    def __init__(self, root):
+    def __init__(self, root, url="file:///temp-plot.html"):
         self.browser_frame = None
         self.navigation_bar = None
+        self.url = url
 
         # Root
         root.geometry("900x640")
@@ -52,7 +52,7 @@ class MainFrame(tk.Frame):
         tk.Grid.columnconfigure(self, 0, weight=0)
 
         # BrowserFrame
-        self.browser_frame = BrowserFrame(self, self.navigation_bar)
+        self.browser_frame = BrowserFrame(self, self.navigation_bar, self.url)
         self.browser_frame.grid(row=1, column=0,
                                 sticky=(tk.N + tk.S + tk.E + tk.W))
         tk.Grid.rowconfigure(self, 1, weight=1)
@@ -107,7 +107,8 @@ class MainFrame(tk.Frame):
 
 class BrowserFrame(tk.Frame):
 
-    def __init__(self, master, navigation_bar=None):
+    def __init__(self, master, navigation_bar=None, url="file:///temp-plot.html"):
+        self.url=url
         self.navigation_bar = navigation_bar
         self.closing = False
         self.browser = None
@@ -122,7 +123,7 @@ class BrowserFrame(tk.Frame):
         rect = [0, 0, self.winfo_width(), self.winfo_height()]
         window_info.SetAsChild(self.get_window_handle(), rect)
         self.browser = cef.CreateBrowserSync(window_info,
-                                             url="file:///temp-plot.html") #todo
+                                             url=self.url) #todo
         assert self.browser
         self.browser.SetClientHandler(LoadHandler(self))
         self.browser.SetClientHandler(FocusHandler(self))
@@ -219,31 +220,31 @@ class NavigationBar(tk.Frame):
         self.reload_image = None
 
         tk.Frame.__init__(self, master)
-        resources = os.path.join(os.path.dirname(__file__), "resources")
+        # resources = os.path.join(os.path.dirname(__file__), "resources")
 
-        # Back button
-        back_png = os.path.join(resources, "back"+IMAGE_EXT)
-        if os.path.exists(back_png):
-            self.back_image = tk.PhotoImage(file=back_png)
-        self.back_button = tk.Button(self, image=self.back_image,
-                                     command=self.go_back)
-        self.back_button.grid(row=0, column=0)
+        # # Back button
+        # back_png = os.path.join(resources, "back"+IMAGE_EXT)
+        # if os.path.exists(back_png):
+        #     self.back_image = tk.PhotoImage(file=back_png)
+        # self.back_button = tk.Button(self, image=self.back_image,
+        #                              command=self.go_back)
+        # self.back_button.grid(row=0, column=0)
 
-        # Forward button
-        forward_png = os.path.join(resources, "forward"+IMAGE_EXT)
-        if os.path.exists(forward_png):
-            self.forward_image = tk.PhotoImage(file=forward_png)
-        self.forward_button = tk.Button(self, image=self.forward_image,
-                                        command=self.go_forward)
-        self.forward_button.grid(row=0, column=1)
+        # # Forward button
+        # forward_png = os.path.join(resources, "forward"+IMAGE_EXT)
+        # if os.path.exists(forward_png):
+        #     self.forward_image = tk.PhotoImage(file=forward_png)
+        # self.forward_button = tk.Button(self, image=self.forward_image,
+        #                                 command=self.go_forward)
+        # self.forward_button.grid(row=0, column=1)
 
-        # Reload button
-        reload_png = os.path.join(resources, "reload"+IMAGE_EXT)
-        if os.path.exists(reload_png):
-            self.reload_image = tk.PhotoImage(file=reload_png)
-        self.reload_button = tk.Button(self, image=self.reload_image,
-                                       command=self.reload)
-        self.reload_button.grid(row=0, column=2)
+        # # Reload button
+        # reload_png = os.path.join(resources, "reload"+IMAGE_EXT)
+        # if os.path.exists(reload_png):
+        #     self.reload_image = tk.PhotoImage(file=reload_png)
+        # self.reload_button = tk.Button(self, image=self.reload_image,
+        #                                command=self.reload)
+        # self.reload_button.grid(row=0, column=2)
 
         # Url entry
         self.url_entry = tk.Entry(self)
@@ -259,17 +260,17 @@ class NavigationBar(tk.Frame):
         # Update state of buttons
         self.update_state()
 
-    def go_back(self):
-        if self.master.get_browser():
-            self.master.get_browser().GoBack()
+    # def go_back(self):
+    #     if self.master.get_browser():
+    #         self.master.get_browser().GoBack()
 
-    def go_forward(self):
-        if self.master.get_browser():
-            self.master.get_browser().GoForward()
+    # def go_forward(self):
+    #     if self.master.get_browser():
+    #         self.master.get_browser().GoForward()
 
-    def reload(self):
-        if self.master.get_browser():
-            self.master.get_browser().Reload()
+    # def reload(self):
+    #     if self.master.get_browser():
+    #         self.master.get_browser().Reload()
 
     def set_url(self, url):
         self.url_entry.delete(0, tk.END)
@@ -294,13 +295,13 @@ class NavigationBar(tk.Frame):
     def update_state(self):
         browser = self.master.get_browser()
         if not browser:
-            if self.back_state != tk.DISABLED:
-                self.back_button.config(state=tk.DISABLED)
-                self.back_state = tk.DISABLED
-            if self.forward_state != tk.DISABLED:
-                self.forward_button.config(state=tk.DISABLED)
-                self.forward_state = tk.DISABLED
-            self.after(100, self.update_state)
+            # if self.back_state != tk.DISABLED:
+            #     self.back_button.config(state=tk.DISABLED)
+            #     self.back_state = tk.DISABLED
+            # if self.forward_state != tk.DISABLED:
+            #     self.forward_button.config(state=tk.DISABLED)
+            #     self.forward_state = tk.DISABLED
+            # self.after(100, self.update_state)
             return
         if browser.CanGoBack():
             if self.back_state != tk.NORMAL:
@@ -336,7 +337,7 @@ def main():
     sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
 
     root = tk.Tk()
-    app = MainFrame(root)
+    app = MainFrame(root, url="file:///temp-plot.html")
     # Tk must be initialized before CEF otherwise fatal error (Issue #306)
     cef.Initialize()
     
