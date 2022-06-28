@@ -103,18 +103,22 @@ class GraphicInterface(object):
  
         indxColumn = 0
         indxRow = 1
-        for i, label in enumerate(dfLbels):
+        aux = 0
+        for label in dfLbels:
             if label == 'Data' or label == 'Hora (UTC)' or label == 'DateTime (UTC'+self.fuso+')' or label == 'Date (UTC'+self.fuso+')':
                 pass
             else:
+                aux += 1
                 print(label)
                 btn = Button(dfOpitionsScreen, text = label)
                 btn.grid(column = indxColumn, row = indxRow)
                 indxColumn += 1
-                if (i%4 == 0):
-                    print(i)
+                if (aux == 4):
+                    print(aux)
                     indxRow += 1
                     indxColumn = 0
+                    aux = 0
+                
                 
                     
 
@@ -191,8 +195,9 @@ class GraphicInterface(object):
         btns=[]
         for mes in list(self.dataFrames.keys()):
             # btn = Button(self.screen, text = mes)
+            print('key: ', mes)
             btnName=self.dataFrames[mes]['Date (UTC'+self.fuso+')'].values[0]+' a '+self.dataFrames[mes]['Date (UTC'+self.fuso+')'].values[-1]
-            btn = Button(self.mainScreen, text = btnName, command= lambda j=mes: self.gerar_grafico(j, btnName))
+            btn = Button(self.mainScreen, text = btnName, command= lambda j=mes, nome = btnName: self.gerar_grafico(j, nome))
             btns.append(btn)
         for i, j in enumerate(btns):
             j.grid(column=self.infoSplitDataFrameButton["column"], row=self.infoSplitDataFrameButton["row"]+i+1)
@@ -214,8 +219,13 @@ class GraphicInterface(object):
     def gerar_grafico(self, key_referencia, nome_referencia):
         mediaPorHora, horasDoDia = mediaDia(self.dataFrames[key_referencia], 'Radiacao (Jh/m²)', self.fuso)
         print(self.dataFrames[key_referencia])
+        print('NOME: ', nome_referencia)
         geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação '+nome_referencia)
-        #tSV.main()
+        tSV.main()
+
+    # def gerar_rafico_fullDf(self, label):
+    #     mediaPorHora, horasDoDia = mediaDia(self.dataFrames[key_referencia], label, self.fuso)
+
 
 
 	  
