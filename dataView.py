@@ -13,21 +13,28 @@ def geraGrafico(eixoX, legendaX, eixoY, legendaY, titulo):
 
 #Plota gráfico utilizando recursos da biblioteca plotly
 def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
+
     max_value = max(eixoY)
     indx_max_values = np.where(eixoY == max_value)
-    max_values = [max_value]*len(indx_max_values[0])
+    max_valuesY = [max_value]*len(indx_max_values[0])
+    max_valuesX=[]
+    for i in indx_max_values[0]:
+        max_valuesX.append(eixoX[i])
 
     min_value = min(eixoY)
     indx_min_values= np.where(eixoY == min_value)
-    min_values=[min_value]*len(indx_min_values[0])
+    min_valuesY=[min_value]*len(indx_min_values[0])
+    min_valuesX=[]
+    for i in indx_min_values[0]:
+        min_valuesX.append(eixoX[i])
     
    
     layout = go.Layout(title=titulo, yaxis={'title':legendaY},xaxis={'title': legendaX})
     grafico = go.Scatter(x = eixoX, y = eixoY, mode = 'markers+lines', line=dict(color='rgb(0,0,0)'), name = titulo)
 
     fig = go.Figure(data=grafico, layout=layout)
-    fig.add_trace(go.Scatter(x = indx_max_values[0], y = max_values, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(color='rgb(0,0,255)',size=10),name = 'Valor Máximo'))
-    fig.add_trace(go.Scatter(x = indx_min_values[0], y = min_values, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(color='rgb(255,0,0)',size=10), name = 'Valor Mínimo'))
+    fig.add_trace(go.Scatter(x = max_valuesX, y = max_valuesY, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(color='rgb(0,0,255)',size=10),name = 'Valor Máximo'))
+    fig.add_trace(go.Scatter(x = min_valuesX, y = min_valuesY, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(color='rgb(255,0,0)',size=10), name = 'Valor Mínimo'))
 
     py.plot(fig, auto_open=False)
 

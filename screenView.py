@@ -146,7 +146,8 @@ class GraphicInterface(object):
 # Gera uma janela com o gráfico do mês de referência
     def gerar_grafico(self, mes_referencia):
         mediaPorHora, horasDoDia = mediaDia(self.dataFrames[mes_referencia], 'Radiacao (Jh/m²)', self.fuso)
-        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação média o do Mês')
+        print(self.dataFrames[mes_referencia])
+        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação média o do Mês: '+mes_referencia)
         tSV.main()
 
 
