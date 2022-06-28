@@ -125,7 +125,8 @@ class GraphicInterface(object):
         btns=[]
         for mes in list(self.dataFrames.keys()):
             # btn = Button(self.screen, text = mes)
-            btn = Button(self.screen, text = mes, command= lambda j=mes: self.gerar_grafico(j))
+            btnName=self.dataFrames[mes]['Date (UTC'+self.fuso+')'].values[0]+' a '+self.dataFrames[mes]['Date (UTC'+self.fuso+')'].values[-1]
+            btn = Button(self.screen, text = btnName, command= lambda j=mes: self.gerar_grafico(j, btnName))
             btns.append(btn)
         for i, j in enumerate(btns):
             j.grid(column=self.infoSplitDataFrameButton["column"], row=self.infoSplitDataFrameButton["row"]+i+1)
@@ -144,10 +145,10 @@ class GraphicInterface(object):
             self.hidenLabelButton["text"] = 'Mostrar'
         
 # Gera uma janela com o gráfico do mês de referência
-    def gerar_grafico(self, mes_referencia):
-        mediaPorHora, horasDoDia = mediaDia(self.dataFrames[mes_referencia], 'Radiacao (Jh/m²)', self.fuso)
-        print(self.dataFrames[mes_referencia])
-        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação média o do Mês: '+mes_referencia)
+    def gerar_grafico(self, key_referencia, nome_referencia):
+        mediaPorHora, horasDoDia = mediaDia(self.dataFrames[key_referencia], 'Radiacao (Jh/m²)', self.fuso)
+        print(self.dataFrames[key_referencia])
+        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação '+nome_referencia)
         tSV.main()
 
 
