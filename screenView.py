@@ -27,6 +27,27 @@ def destroyAndRecover(screen1, screen2):
         screen1.destroy()
         screen2.deiconify()
 
+def tratamento_formato_data(data):
+
+    if data == '':
+        showinfo(title='Erro', message='Nenhuma data foi selecionada')
+    else:
+        data_completa = data.split('/')
+        if len(data_completa)==1:
+            print('Ano')
+            # showinfo(title='Info', message='Ano')
+        elif len(data_completa)==2:
+            print('Mês')
+            # showinfo(title='Info', message='Mês')
+        elif len(data_completa)==3:
+            print('Dia')
+            # showinfo(title='Info', message='Dia')
+        else:
+            showinfo(title='Erro', message='Formato de data incorreto!')
+            data = ''
+
+    return data
+
 class GraphicInterface(object): 
     def __init__(self):
 
@@ -59,6 +80,11 @@ class GraphicInterface(object):
         self.fullDataFrameButton.grid(column=0, row=3, padx=10, pady=10)
         self.infoFullDataFrameButton = self.fullDataFrameButton.grid_info()
         self.fullDataFrameButton.grid_forget()
+
+        self.testeButton = Button(self.mainScreen, text='TESTE', command = lambda: self.toTesteScreen(self.mainScreen, self.dataFrame))
+        self.testeButton.grid(column=4, row=100, padx=15, pady=15)
+        self.infoTesteButton = self.testeButton.grid_info()
+        self.testeButton.grid_forget()
 
         self.splitDataFrameButton = Button(self.mainScreen, text='Separa Data Frame por mês', command = self.splitDataFrame)
         self.splitDataFrameButton.grid(column=0, row=4, padx=10, pady=10)
@@ -118,22 +144,90 @@ class GraphicInterface(object):
                     indxRow += 1
                     indxColumn = 0
                     aux = 0
-                
-                
-                    
 
 
         dfOpitionsScreen.mainloop
 
 
-        #         for mes in list(self.dataFrames.keys()):
-        #     # btn = Button(self.screen, text = mes)
-        #     btnName=self.dataFrames[mes]['Date (UTC'+self.fuso+')'].values[0]+' a '+self.dataFrames[mes]['Date (UTC'+self.fuso+')'].values[-1]
-        #     btn = Button(self.mainScreen, text = btnName, command= lambda j=mes: self.gerar_grafico(j, btnName))
-        #     btns.append(btn)
-        # for i, j in enumerate(btns):
-        #     j.grid(column=self.infoSplitDataFrameButton["column"], row=self.infoSplitDataFrameButton["row"]+i+1)
-      
+    def toTesteScreen(self, closedScreen, df):
+        closedScreen.withdraw()
+
+        testeScreen = Tk()
+        testeScreen.title('Opções')
+        testeScreen.protocol("WM_DELETE_WINDOW", disable_event)
+        btnBackToMain = Button(testeScreen, text='Voltar para menu inicial', command = lambda: destroyAndRecover(testeScreen, closedScreen))
+        btnBackToMain.grid(column=101, row=0, padx=15, pady=15)
+        btnConfirm = Button(testeScreen, text='Confirmar', command=self.itens_selecionados)
+        btnConfirm.grid(column=100, row=100, padx=15, pady=15)
+
+        self.labelTipoGrafico = Label(testeScreen, text =  'Tipo de Gráfico')
+        self.labelTipoGrafico.grid(column=0, row=0)
+
+        self.labelLabels = Label(testeScreen, text =  'Variável Analizada')
+        self.labelLabels.grid(column=1, row=0)
+
+        self.labelDate = Label(testeScreen, text =  'Data')
+        self.labelDate.grid(column=3, row=0)
+
+        self.listboxTipoGrafico = Listbox(testeScreen, height=6, exportselection=0)
+        self.listboxTipoGrafico.grid(column=0, row=1, sticky='nwes')
+
+        self.listboxTipoGrafico.insert('end', 'Diário ???')
+        self.listboxTipoGrafico.insert('end', 'Mensal')
+        self.listboxTipoGrafico.insert('end', 'Anual ???')
+
+        self.listboxLabels = Listbox(testeScreen, height=6, exportselection=0)
+        self.listboxLabels.grid(column=1, row=1, sticky='nwes')
+
+        for label in list(df.columns.values):
+            if label == 'Data' or label == 'Hora (UTC)' or label == 'DateTime (UTC'+self.fuso+')' or label == 'Date (UTC'+self.fuso+')':
+                pass
+            else:
+                self.listboxLabels.insert('end', label)
+
+
+        scrollbar = Scrollbar(testeScreen, orient='vertical', command=self.listboxLabels.yview)
+        self.listboxLabels['yscrollcommand'] = scrollbar.set
+        scrollbar.grid(column=2, row=1, sticky='ns')
+
+
+        self.entryDate = Entry(testeScreen)
+        self.entryDate.grid(row=1, column=3)
+
+
+        testeScreen.mainloop
+
+
+    
+    def itens_selecionados(self):
+
+        try:
+            tipo_selecionado = self.listboxTipoGrafico.curselection()[0]
+        except:
+            showinfo(title='Erro', message='Nenhum tipo de gráfico foi selecionado')
+            return
+
+        try:
+            variavel_selecionada = self.listboxLabels.get(self.listboxLabels.curselection())
+        except:
+            showinfo(title='Erro', message='Nenhuma variável foi selecionada')
+            return
+        
+
+        data= tratamento_formato_data(self.entryDate.get())
+
+        if data == '': return
+
+        msg = 'Tipo de Gráfico: '+str(tipo_selecionado)+'\nColuna: ' + variavel_selecionada + '\nData: ' + data
+
+        showinfo(title='item', message=msg)
+
+        try:
+            self.gerar_grafico_qualquer_variavel(data, variavel_selecionada)
+        except:
+            showinfo(title='Erro', message='Erro ao gerar gráfico')
+        
+
 
 # Recupera o fuso horário digitado e, se preciso, recarrega o dstaframe
     def define_fuso_horario(self):
@@ -170,6 +264,8 @@ class GraphicInterface(object):
         fullInterval = self.dataFrame['Date (UTC'+self.fuso+')'].values[0]+' a '+self.dataFrame['Date (UTC'+self.fuso+')'].values[-1]
         self.fullDataFrameButton['text']+=fullInterval
         self.showElement(self.fullDataFrameButton, self.infoFullDataFrameButton)
+
+        self.showElement(self.testeButton, self.infoTesteButton)
 
 # Chama as funções padrões para tratamento do Dataframe
     def setDataFrame(self, fileNames):
@@ -221,6 +317,11 @@ class GraphicInterface(object):
         print(self.dataFrames[key_referencia])
         print('NOME: ', nome_referencia)
         geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação '+nome_referencia)
+        tSV.main()
+
+    def gerar_grafico_qualquer_variavel(self, data_referencia, variavel_referencia):
+        mediaPorHora, horasDoDia = mediaDia(self.dataFrames[data_referencia], variavel_referencia, self.fuso)
+        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, variavel_referencia, 'Gráfico de '+ variavel_referencia + data_referencia)
         tSV.main()
 
     # def gerar_rafico_fullDf(self, label):
