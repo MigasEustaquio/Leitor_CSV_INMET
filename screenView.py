@@ -27,26 +27,29 @@ def destroyAndRecover(screen1, screen2):
         screen1.destroy()
         screen2.deiconify()
 
-def tratamento_formato_data(data):
+def tratamento_formato_data(lista_entries):
 
-    if data == '':
-        showinfo(title='Erro', message='Nenhuma data foi selecionada')
-    else:
-        data_completa = data.split('/')
-        if len(data_completa)==1:
-            print('Ano')
-            # showinfo(title='Info', message='Ano')
-        elif len(data_completa)==2:
-            print('Mês')
-            # showinfo(title='Info', message='Mês')
-        elif len(data_completa)==3:
-            print('Dia')
-            # showinfo(title='Info', message='Dia')
+    datas=[]
+    for entry in lista_entries:
+        data=entry.get()
+
+        if data == '':
+            print('Nenhuma data foi selecionada')
         else:
-            showinfo(title='Erro', message='Formato de data incorreto!')
-            data = ''
+            data_completa = data.split('/')
+            if len(data_completa)==1:
+                print('Ano')
+            elif len(data_completa)==2:
+                print('Mês')
+            elif len(data_completa)==3:
+                print('Dia')
+            else:
+                showinfo(title='Erro', message='Formato de data incorreto!')
+                data = ''
 
-    return data
+            datas.append(data)
+
+    return datas
 
 class GraphicInterface(object): 
     def __init__(self):
@@ -56,6 +59,8 @@ class GraphicInterface(object):
 
         self.fuso='-3'
         self.dataFrameSeparado=False
+        self.numeroEntriesData=0
+        self.lista_entries=[]
 
         self.mainScreen = Tk()
 
@@ -140,7 +145,6 @@ class GraphicInterface(object):
                 btn.grid(column = indxColumn, row = indxRow)
                 indxColumn += 1
                 if (aux == 4):
-                    print(aux)
                     indxRow += 1
                     indxColumn = 0
                     aux = 0
@@ -150,6 +154,8 @@ class GraphicInterface(object):
 
 
     def toTesteScreen(self, closedScreen, df):
+        if not self.dataFrameSeparado: self.splitDataFrame()
+
         closedScreen.withdraw()
 
         testeScreen = Tk()
@@ -190,9 +196,12 @@ class GraphicInterface(object):
         self.listboxLabels['yscrollcommand'] = scrollbar.set
         scrollbar.grid(column=2, row=1, sticky='ns')
 
+        self.buttonAddEntry = Button(testeScreen, text='Adicionar Linha', command=lambda: self.cria_entry_data(testeScreen))
+        self.buttonAddEntry.grid(row=self.numeroEntriesData+3, column=3)
 
-        self.entryDate = Entry(testeScreen)
-        self.entryDate.grid(row=1, column=3)
+        # self.entryDate = Entry(testeScreen)
+        # self.entryDate.grid(row=1, column=3)
+        self.cria_entry_data(testeScreen)
 
 
         testeScreen.mainloop
@@ -214,19 +223,36 @@ class GraphicInterface(object):
             return
         
 
-        data= tratamento_formato_data(self.entryDate.get())
+        datas= tratamento_formato_data(self.lista_entries)
 
-        if data == '': return
+        if not datas:
+            showinfo(title='Erro', message='Nenhuma data foi selecionada')
+            return
 
-        msg = 'Tipo de Gráfico: '+str(tipo_selecionado)+'\nColuna: ' + variavel_selecionada + '\nData: ' + data
-
-        showinfo(title='item', message=msg)
+        msg = 'Tipo de Gráfico: '+str(tipo_selecionado)+'\nColuna: ' + variavel_selecionada + '\nData:'
+        for data in datas: msg+=' '+data
+        print(msg)
 
         try:
-            self.gerar_grafico_qualquer_variavel(data, variavel_selecionada)
+            self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada)
         except:
-            showinfo(title='Erro', message='Erro ao gerar gráfico')
+            showinfo(title='Erro', message='Erro ao gerar gráfico') #erro genérico provisório
+
         
+        
+
+
+    def cria_entry_data(self, testeScreen):
+
+        self.numeroEntriesData+=1
+
+        entryDate = Entry(testeScreen)
+        entryDate.grid(row=self.numeroEntriesData+1, column=3)
+        self.lista_entries.append(entryDate)
+
+        self.buttonAddEntry.destroy()
+        self.buttonAddEntry = Button(testeScreen, text='Adicionar Linha', command=lambda: self.cria_entry_data(testeScreen))
+        self.buttonAddEntry.grid(row=self.numeroEntriesData+2, column=3)
 
 
 # Recupera o fuso horário digitado e, se preciso, recarrega o dstaframe
@@ -290,8 +316,7 @@ class GraphicInterface(object):
 # Criando lista de botões associados aos meses
         btns=[]
         for mes in list(self.dataFrames.keys()):
-            # btn = Button(self.screen, text = mes)
-            print('key: ', mes)
+            # print('key: ', mes)
             btnName=self.dataFrames[mes]['Date (UTC'+self.fuso+')'].values[0]+' a '+self.dataFrames[mes]['Date (UTC'+self.fuso+')'].values[-1]
             btn = Button(self.mainScreen, text = btnName, command= lambda j=mes, nome = btnName: self.gerar_grafico(j, nome))
             btns.append(btn)
@@ -319,10 +344,30 @@ class GraphicInterface(object):
         geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação '+nome_referencia)
         tSV.main()
 
-    def gerar_grafico_qualquer_variavel(self, data_referencia, variavel_referencia):
-        mediaPorHora, horasDoDia = mediaDia(self.dataFrames[data_referencia], variavel_referencia, self.fuso)
-        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, variavel_referencia, 'Gráfico de '+ variavel_referencia + data_referencia)
-        tSV.main()
+
+#Tornar possível fazer gráfico com várias variávei
+    def gerar_grafico_qualquer_variavel(self, tipo_grafico, datas_referencia, variavel_referencia):
+
+        for data in datas_referencia:
+            print(data)
+
+        # if tipo_grafico == 0: # Gráfico Diário
+        #     showinfo(title='Erro', message='Não implementado')
+        #     return
+
+        # elif tipo_grafico == 1: # Gráfico Mensal
+        #     eixoY, eixoX = mediaDia(self.dataFrames[data_referencia], variavel_referencia, self.fuso)
+
+        # elif tipo_grafico == 2: # Gráfico Anual
+        #     showinfo(title='Erro', message='Não implementado')
+        #     return
+
+        # geraGraficoBonito(eixoX, 'Hora '+'(UTC'+self.fuso+')' , eixoY, variavel_referencia, 'Gráfico de '+ variavel_referencia + ' ' + data_referencia)
+        # tSV.main()
+
+
+
+
 
     # def gerar_rafico_fullDf(self, label):
     #     mediaPorHora, horasDoDia = mediaDia(self.dataFrames[key_referencia], label, self.fuso)

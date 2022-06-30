@@ -121,7 +121,6 @@ def separar_dataframes(df, fuso):
             if mes_e_ano != mes_anterior:
                 meses_e_indicesDF[mes_e_ano]=index
                 mes_anterior=mes_e_ano
-    # print(meses_e_indicesDF)
     dfs=np.split(df, list(meses_e_indicesDF.values())[1:], axis=0)
 
     meses_e_indicesDF=sorted(meses_e_indicesDF.keys())
