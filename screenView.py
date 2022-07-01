@@ -3,6 +3,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from tkinter.messagebox import showinfo
 import pandas as pd
+import re
 
 from manipulaDataFame import *
 from dataView import *
@@ -17,8 +18,6 @@ def getFiles(fullpaths):
         dfs.append(df)
     return dfs
 
-MES_DE_REFERENCIA='04/2022'
-
 def disable_event():
     messagebox.showinfo('Não funciona','Usar o botão do menu')
     pass
@@ -28,21 +27,40 @@ def destroyAndRecover(screen1, screen2):
         screen2.deiconify()
 
 def tratamento_formato_data(lista_entries):
+    padrao_dia = re.compile("[0-9]{2}[/][0-9]{2}[/][0-9]{4}")
+    padrao_mes = re.compile("[0-9]{2}[/][0-9]{4}")
+    padrao_ano = re.compile("[0-9]{4}")
 
     datas=[]
     for entry in lista_entries:
         data=entry.get()
 
-        if data == '':
+        # if data == '':
+        #     print('Nenhuma data foi selecionada')
+        # else:
+        #     data_completa = data.split('/')
+        #     if len(data_completa)==1:
+        #         print('Ano')
+        #     elif len(data_completa)==2:
+        #         print('Mês')
+        #     elif len(data_completa)==3:
+        #         print('Dia')
+        #     else:
+        #         showinfo(title='Erro', message='Formato de data incorreto!')
+        #         data = ''
+        
+        if not data:
             print('Nenhuma data foi selecionada')
         else:
-            data_completa = data.split('/')
-            if len(data_completa)==1:
-                print('Ano')
-            elif len(data_completa)==2:
-                print('Mês')
-            elif len(data_completa)==3:
-                print('Dia')
+            match_dia = padrao_dia.match(data)
+            match_mes = padrao_mes.match(data)
+            match_ano = padrao_ano.match(data)
+            if match_dia:
+                print(f'DIA {data}')
+            elif match_mes:
+                print(f'MÊS {data}')
+            elif match_ano:
+                print(f'ANO {data}')
             else:
                 showinfo(title='Erro', message='Formato de data incorreto!')
                 data = ''
@@ -211,22 +229,33 @@ class GraphicInterface(object):
         self.scrollbarIntervalOp.grid(column=self.listBoxIntervalOpInfo['column']+1, row=self.listBoxIntervalOpInfo['row'], sticky='ns')
         self.scrollbarIntervalOpInfos = self.scrollbarIntervalOp.grid_info()
 
-        self.labelDate = Label(testeScreen, text =  'Data')
-        self.labelDate.grid(column=self.labelLabelsInfo['column']+2, row=0)
-        self.labelDateInfo = self.labelDate.grid_info()
+        self.labelEntrys = Label(testeScreen, text =  'Entradas')
+        self.labelEntrys.grid(column=self.labelLabelsInfo['column']+2, row=0)
+        self.labelEntrysInfo = self.labelEntrys.grid_info()
+        
+        self.listBoxEntrys = Listbox(testeScreen, height=6, exportselection=0)
+        self.listBoxEntrys.grid(column=self.labelEntrysInfo['column'], row=self.labelEntrysInfo['row']+1, sticky='nwes')
+        self.listBoxlabelEntrysInfo = self.listBoxEntrys.grid_info()
+
+        self.scrollbarEntrys = Scrollbar(testeScreen, orient='vertical', command=self.listBoxEntrys.yview)
+        self.listBoxEntrys['yscrollcommand'] = self.scrollbarEntrys.set
+        self.scrollbarEntrys.grid(column=self.listBoxlabelEntrysInfo['column']+1, row=self.listBoxlabelEntrysInfo['row'], sticky='ns')
+        self.scrollbarEntrysInfos = self.scrollbarIntervalOp.grid_info()
+        
+        self.btnLimpar = Button(testeScreen, text='Limpar')
+        self.btnLimpar.grid(row = self.listBoxlabelEntrysInfo['row']+1, column = self.listBoxlabelEntrysInfo['column'])
+        self.btnLimparInfo = self.btnLimpar.grid_info()
+        
 
         self.btnAvancar = Button(testeScreen, text='Avançar', command = lambda: self.op_intervalo_data(self.listboxTipoGrafico, testeScreen))
         self.btnAvancar.grid(row = self.listboxTipoGraficoInfo['row']+1, column = self.listboxTipoGraficoInfo['column'])
         self.btnAvancarInfo = self.btnAvancar.grid_info()
     
-  
-
         self.btnVoltar = Button(testeScreen, text = 'Voltar', command = lambda: print('voltar'))
-        print(len(self.btnVoltar.grid_info()))
-        
 
         self.buttonAddEntry = Button(testeScreen, text='Adicionar Linha', command=lambda: self.cria_entry_data(testeScreen))
-        self.buttonAddEntry.grid(row=self.numeroEntriesData+3, column=self.labelDateInfo['column'])
+        self.buttonAddEntry.grid(row=self.btnLimparInfo['row']+1, column=self.labelEntrysInfo['column'])
+        self.buttonAddEntryInfo = self.buttonAddEntry.grid_info()
 
         # self.entryDate = Entry(testeScreen)
         # self.entryDate.grid(row=1, column=3)
@@ -317,14 +346,21 @@ class GraphicInterface(object):
     def cria_entry_data(self, testeScreen):
 
         self.numeroEntriesData+=1
+        
+        self.buttonAddEntry.grid_forget()
 
         entryDate = Entry(testeScreen)
-        entryDate.grid(row=self.numeroEntriesData+1, column=self.labelDateInfo['column'])
+        #entryDate.grid(row=self.numeroEntriesData+2, column=self.labelEntrysInfo['column'])
+        self.showElement(entryDate, self.buttonAddEntryInfo)
         self.lista_entries.append(entryDate)
 
-        self.buttonAddEntry.destroy()
-        self.buttonAddEntry = Button(testeScreen, text='Adicionar Linha', command=lambda: self.cria_entry_data(testeScreen))
-        self.buttonAddEntry.grid(row=self.numeroEntriesData+2, column=self.labelDateInfo['column'])
+        
+        self.buttonAddEntryInfo['row'] += 1 
+        self.showElement(self.buttonAddEntry, self.buttonAddEntryInfo)
+        
+        # self.buttonAddEntry.destroy()
+        # self.buttonAddEntry = Button(testeScreen, text='Adicionar Linha', command=lambda: self.cria_entry_data(testeScreen))
+        # self.buttonAddEntry.grid(row=self.numeroEntriesData+3, column=self.labelEntrysInfo['column'])
 
 
 # Recupera o fuso horário digitado e, se preciso, recarrega o dstaframe
