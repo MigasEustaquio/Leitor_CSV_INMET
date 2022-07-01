@@ -116,7 +116,7 @@ class GraphicInterface(object):
         closedScreen.withdraw()
         self.btnBS1 = Button(self.screen2, text='volta para 1', command = lambda: destroyAndRecover(self.screen2, closedScreen))
         self.btnBS1.grid(column=2, row=1, padx=15, pady=15)
-        self.screen2.protocol("WM_DELETE_WINDOW", disable_event)
+        self.screen2.protocol("WM_DELETE_WINDOW",  lambda: destroyAndRecover(self.screen2, closedScreen))
         self.screen2.mainloop()
 
     def toDfOpitions(self, closedScreen, df):
@@ -124,7 +124,7 @@ class GraphicInterface(object):
 
         dfOpitionsScreen = Tk()
         dfOpitionsScreen.title('Opções')
-        dfOpitionsScreen.protocol("WM_DELETE_WINDOW", disable_event)
+        dfOpitionsScreen.protocol("WM_DELETE_WINDOW", lambda: destroyAndRecover(dfOpitionsScreen, closedScreen))
         btnBackToMain = Button(dfOpitionsScreen, text='Voltar para menu inicial', command = lambda: destroyAndRecover(dfOpitionsScreen, closedScreen))
         btnBackToMain.grid(column=100, row=0, padx=15, pady=15)
         
@@ -160,7 +160,7 @@ class GraphicInterface(object):
 
         testeScreen = Tk()
         testeScreen.title('Opções')
-        testeScreen.protocol("WM_DELETE_WINDOW", disable_event)
+        testeScreen.protocol("WM_DELETE_WINDOW", lambda: destroyAndRecover(testeScreen, closedScreen))
         btnBackToMain = Button(testeScreen, text='Voltar para menu inicial', command = lambda: destroyAndRecover(testeScreen, closedScreen))
         btnBackToMain.grid(column=101, row=0, padx=15, pady=15)
         btnConfirm = Button(testeScreen, text='Confirmar', command=self.itens_selecionados)
@@ -168,22 +168,27 @@ class GraphicInterface(object):
 
         self.labelTipoGrafico = Label(testeScreen, text =  'Tipo de Gráfico')
         self.labelTipoGrafico.grid(column=0, row=0)
+        self.labelTipoGraficoInfo = self.labelTipoGrafico.grid_info()
 
-        self.labelLabels = Label(testeScreen, text =  'Variável Analizada')
-        self.labelLabels.grid(column=1, row=0)
+        self.labelIntervalOP = Label(testeScreen, text = 'Opções')
+        self.labelIntervalOP.grid(column=self.labelTipoGraficoInfo['column']+1, row=0)
+        self.labelIntervalOPInfo = self.labelIntervalOP.grid_info()
 
-        self.labelDate = Label(testeScreen, text =  'Data')
-        self.labelDate.grid(column=3, row=0)
+        self.labelLabels = Label(testeScreen, text = 'Variável Analizada')
+        self.labelLabels.grid(column=self.labelIntervalOPInfo['column']+2, row=0)
+        self.labelLabelsInfo = self.labelLabels.grid_info()
 
         self.listboxTipoGrafico = Listbox(testeScreen, height=6, exportselection=0)
-        self.listboxTipoGrafico.grid(column=0, row=1, sticky='nwes')
+        self.listboxTipoGrafico.grid(column=self.labelTipoGraficoInfo['column'], row=self.labelTipoGraficoInfo['row']+1, sticky='nwes')
+        self.listboxTipoGraficoInfo = self.listboxTipoGrafico.grid_info()
 
-        self.listboxTipoGrafico.insert('end', 'Diário ???')
+        self.listboxTipoGrafico.insert('end', 'Diário')
         self.listboxTipoGrafico.insert('end', 'Mensal')
-        self.listboxTipoGrafico.insert('end', 'Anual ???')
+        self.listboxTipoGrafico.insert('end', 'Anual')
 
         self.listboxLabels = Listbox(testeScreen, height=6, exportselection=0)
-        self.listboxLabels.grid(column=1, row=1, sticky='nwes')
+        self.listboxLabels.grid(column=self.labelLabelsInfo['column'], row=self.labelLabelsInfo['row']+1, sticky='nwes')
+        self.listboxLabelsInfo = self.listboxLabels.grid_info()
 
         for label in list(df.columns.values):
             if label == 'Data' or label == 'Hora (UTC)' or label == 'DateTime (UTC'+self.fuso+')' or label == 'Date (UTC'+self.fuso+')':
@@ -192,12 +197,36 @@ class GraphicInterface(object):
                 self.listboxLabels.insert('end', label)
 
 
-        scrollbar = Scrollbar(testeScreen, orient='vertical', command=self.listboxLabels.yview)
-        self.listboxLabels['yscrollcommand'] = scrollbar.set
-        scrollbar.grid(column=2, row=1, sticky='ns')
+        self.scrollbarLabels = Scrollbar(testeScreen, orient='vertical', command=self.listboxLabels.yview)
+        self.listboxLabels['yscrollcommand'] = self.scrollbarLabels.set
+        self.scrollbarLabels.grid(column=self.listboxLabelsInfo['column']+1, row=self.listboxLabelsInfo['row'], sticky='ns')
+        self.scrollbarLabelInfos =  self.scrollbarLabels.grid_info()
+
+        self.listBoxIntervalOp = Listbox(testeScreen, height=6, exportselection=0)
+        self.listBoxIntervalOp.grid(column=self.labelIntervalOPInfo['column'], row=self.labelIntervalOPInfo['row']+1, sticky='nwes')
+        self.listBoxIntervalOpInfo = self.listBoxIntervalOp.grid_info()
+
+        self.scrollbarIntervalOp = Scrollbar(testeScreen, orient='vertical', command=self.listBoxIntervalOp.yview)
+        self.listBoxIntervalOp['yscrollcommand'] = self.scrollbarIntervalOp.set
+        self.scrollbarIntervalOp.grid(column=self.listBoxIntervalOpInfo['column']+1, row=self.listBoxIntervalOpInfo['row'], sticky='ns')
+        self.scrollbarIntervalOpInfos = self.scrollbarIntervalOp.grid_info()
+
+        self.labelDate = Label(testeScreen, text =  'Data')
+        self.labelDate.grid(column=self.labelLabelsInfo['column']+2, row=0)
+        self.labelDateInfo = self.labelDate.grid_info()
+
+        self.btnAvancar = Button(testeScreen, text='Avançar', command = lambda: self.op_intervalo_data(self.listboxTipoGrafico, testeScreen))
+        self.btnAvancar.grid(row = self.listboxTipoGraficoInfo['row']+1, column = self.listboxTipoGraficoInfo['column'])
+        self.btnAvancarInfo = self.btnAvancar.grid_info()
+    
+  
+
+        self.btnVoltar = Button(testeScreen, text = 'Voltar', command = lambda: print('voltar'))
+        print(len(self.btnVoltar.grid_info()))
+        
 
         self.buttonAddEntry = Button(testeScreen, text='Adicionar Linha', command=lambda: self.cria_entry_data(testeScreen))
-        self.buttonAddEntry.grid(row=self.numeroEntriesData+3, column=3)
+        self.buttonAddEntry.grid(row=self.numeroEntriesData+3, column=self.labelDateInfo['column'])
 
         # self.entryDate = Entry(testeScreen)
         # self.entryDate.grid(row=1, column=3)
@@ -206,7 +235,50 @@ class GraphicInterface(object):
 
         testeScreen.mainloop
 
+    def op_intervalo_data(self, listBox, screen):
+        try:
+            op = listBox.curselection()[0]
+            print(op)
+            if (len(self.btnVoltar.grid_info()) == 0):
+                self.btnAvancar.grid_remove()
 
+                self.btnVoltar.grid(row = self.listboxTipoGraficoInfo['row']+1, column = self.listboxTipoGraficoInfo['column'])
+                self.btnVoltarInfo = self.btnVoltar.grid_info()
+
+                self.btnAvancarInfo['column'] = self.labelIntervalOPInfo['column']
+                self.showElement(self.btnAvancar, self.btnAvancarInfo)
+            
+
+            if op == 0:#dia
+                self.selecionarDia()
+                self.btnVoltar.configure(command = lambda: print('voltar dia'))
+
+            elif op == 1:#mes
+                self.selecionarMes()
+                self.btnVoltar.configure(command = lambda: print('voltar ano mes'))
+
+            elif op == 2:#ano
+                self.selecionarAno()
+                self.btnVoltar.configure(command = lambda: print('voltar ano ano'))
+        except IndexError:
+            showinfo(title='Erro', message='Selecione um tipo de intervalo de entrada')
+            return
+        
+    def selecionarAno(self):
+        self.labelIntervalOP['text'] = 'Selecione o Ano'
+        self.listBoxIntervalOp.delete(0, END)
+        self.listBoxIntervalOp.insert('end', 'ano')
+
+    def selecionarMes(self):
+        self.labelIntervalOP['text'] = 'Selecione o Mês'
+        self.listBoxIntervalOp.delete(0, END)
+        self.listBoxIntervalOp.insert('end', 'mes')
+        
+    def selecionarDia(self):
+        self.labelIntervalOP['text'] = 'Selecione o Dia'
+        self.listBoxIntervalOp.delete(0, END)
+        self.listBoxIntervalOp.insert('end', 'dia')
+        
     
     def itens_selecionados(self):
 
@@ -247,12 +319,12 @@ class GraphicInterface(object):
         self.numeroEntriesData+=1
 
         entryDate = Entry(testeScreen)
-        entryDate.grid(row=self.numeroEntriesData+1, column=3)
+        entryDate.grid(row=self.numeroEntriesData+1, column=self.labelDateInfo['column'])
         self.lista_entries.append(entryDate)
 
         self.buttonAddEntry.destroy()
         self.buttonAddEntry = Button(testeScreen, text='Adicionar Linha', command=lambda: self.cria_entry_data(testeScreen))
-        self.buttonAddEntry.grid(row=self.numeroEntriesData+2, column=3)
+        self.buttonAddEntry.grid(row=self.numeroEntriesData+2, column=self.labelDateInfo['column'])
 
 
 # Recupera o fuso horário digitado e, se preciso, recarrega o dstaframe
