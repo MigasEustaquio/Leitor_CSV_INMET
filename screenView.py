@@ -247,7 +247,7 @@ class GraphicInterface(object):
         self.btnLimparInfo = self.btnLimpar.grid_info()
         
 
-        self.btnAvancar = Button(testeScreen, text='Avançar', command = lambda: self.op_intervalo_data(self.listboxTipoGrafico, testeScreen))
+        self.btnAvancar = Button(testeScreen, text='Avançar', command = lambda: self.op_intervalo_data(self.listboxTipoGrafico))
         self.btnAvancar.grid(row = self.listboxTipoGraficoInfo['row']+1, column = self.listboxTipoGraficoInfo['column'])
         self.btnAvancarInfo = self.btnAvancar.grid_info()
     
@@ -264,10 +264,11 @@ class GraphicInterface(object):
 
         testeScreen.mainloop
 
-    def op_intervalo_data(self, listBox, screen):
+    def op_intervalo_data(self, listBox):
+        self.opMes = None
         try:
             op = listBox.curselection()[0]
-            print(op)
+            print(listBox.get(op))
             if (len(self.btnVoltar.grid_info()) == 0):
                 self.btnAvancar.grid_remove()
 
@@ -279,11 +280,17 @@ class GraphicInterface(object):
             
 
             if op == 0:#dia
-                self.selecionarDia()
-                self.btnVoltar.configure(command = lambda: print('voltar dia'))
+                self.carregaMes()
+                print('nanana')
+                if self.opMes is not None:
+                    print('é pra ir')
+                    self.btnAvancar.configure(command = lambda: self.carregarDia())
+                print('chega ?')
+                
+                
 
             elif op == 1:#mes
-                self.selecionarMes()
+                self.carregaMes()
                 self.btnVoltar.configure(command = lambda: print('voltar ano mes'))
 
             elif op == 2:#ano
@@ -298,15 +305,42 @@ class GraphicInterface(object):
         self.listBoxIntervalOp.delete(0, END)
         self.listBoxIntervalOp.insert('end', 'ano')
 
-    def selecionarMes(self):
+    def carregaMes(self):
         self.labelIntervalOP['text'] = 'Selecione o Mês'
         self.listBoxIntervalOp.delete(0, END)
-        self.listBoxIntervalOp.insert('end', 'mes')
+        self.dataFrameMeses = separar_dataframes(self.dataFrame, self.fuso)
+        for dataMes in list(self.dataFrameMeses.keys()):
+            self.listBoxIntervalOp.insert('end', dataMes)
         
-    def selecionarDia(self):
+        self.btnAvancar.configure(command = lambda: self.sececinarMes(self.listBoxIntervalOp))
+            
+    def sececinarMes(self, listBox):
+        try: 
+            op = listBox.curselection()[0]
+            self.opMes = listBox.get(op)
+            print (self.opMes)
+            return
+        except IndexError:
+            showinfo(title='Erro', message='Selecione o mês')
+            return
+        
+    def carregarDia(self):
+        print(self.opMes, ' agora o dia')
         self.labelIntervalOP['text'] = 'Selecione o Dia'
-        self.listBoxIntervalOp.delete(0, END)
-        self.listBoxIntervalOp.insert('end', 'dia')
+        #self.listBoxIntervalOp.delete(0, END)
+        self.dataFrameDias = self.dataFrameMeses[self.opMes]
+        print(self.dataFrameDias)
+        
+        
+    def selecionarDia(self, listBox):
+        
+        try:
+            self.btnVoltar.configure(command = lambda: print('voltar dia'))
+            
+        except IndexError:
+            showinfo(title='Erro', message='Selecione o dia')
+            self.carregaMes()
+            return
         
     
     def itens_selecionados(self):
