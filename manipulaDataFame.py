@@ -100,6 +100,7 @@ def listaDias(df, fuso):
 
     dias = df['Date '+formato_fuso].values
     listaDias=list(set(dias))
+    print(listaDias)
     return sorted(listaDias, key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y"))
 
 def separar_dataframes(df, fuso):
@@ -123,7 +124,9 @@ def separar_dataframes(df, fuso):
                 mes_anterior=mes_e_ano
     dfs=np.split(df, list(meses_e_indicesDF.values())[1:], axis=0)
 
-    meses_e_indicesDF=sorted(meses_e_indicesDF.keys())
+    meses_e_indicesDF=sorted(meses_e_indicesDF.keys(), key=lambda date: datetime.datetime.strptime(date, "%m/%Y"))
+
+    #sorted(listaDias, key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y"))
 
     for i, mes in enumerate(meses_e_indicesDF):
         dicionario_de_meses[mes] = dfs[i]

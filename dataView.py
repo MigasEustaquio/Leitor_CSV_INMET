@@ -12,8 +12,33 @@ def geraGrafico(eixoX, legendaX, eixoY, legendaY, titulo):
     plt.show()
 
 #Plota gráfico utilizando recursos da biblioteca plotly
-def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
+def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, numero_curvas=1):    
+   
+    layout = go.Layout(title=titulo, yaxis={'title':legendaY},xaxis={'title': legendaX})
+    
+    for curva in range(numero_curvas):
 
+        max_valuesX, max_valuesY, min_valuesX, min_valuesY = get_max_min(eixoX[curva], eixoY[curva])
+
+        if curva == 0:
+
+            grafico = go.Scatter(x = eixoX[curva], y = eixoY[curva], mode = 'markers+lines', line=dict(color='rgb(0,0,0)'), name = titulo)
+
+            fig = go.Figure(data=grafico, layout=layout)
+            fig.add_trace(go.Scatter(x = max_valuesX, y = max_valuesY, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(color='rgb(0,0,255)',size=10),name = 'Valor Máximo'))
+            fig.add_trace(go.Scatter(x = min_valuesX, y = min_valuesY, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(color='rgb(255,0,0)',size=10), name = 'Valor Mínimo'))
+
+        else:
+
+            fig.add_trace(go.Scatter(x = eixoX[curva], y = eixoY[curva], mode = 'markers+lines', name = titulo))
+            
+            fig.add_trace(go.Scatter(x = max_valuesX, y = max_valuesY, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(color='rgb(0,0,255)',size=10),name = 'Valor Máximo'))
+            fig.add_trace(go.Scatter(x = min_valuesX, y = min_valuesY, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(color='rgb(255,0,0)',size=10), name = 'Valor Mínimo'))
+
+
+    py.plot(fig, auto_open=False)
+
+def get_max_min(eixoX, eixoY):
     max_value = max(eixoY)
     indx_max_values = np.where(eixoY == max_value)
     max_valuesY = [max_value]*len(indx_max_values[0])
@@ -27,16 +52,8 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
     min_valuesX=[]
     for i in indx_min_values[0]:
         min_valuesX.append(eixoX[i])
-    
-   
-    layout = go.Layout(title=titulo, yaxis={'title':legendaY},xaxis={'title': legendaX})
-    grafico = go.Scatter(x = eixoX, y = eixoY, mode = 'markers+lines', line=dict(color='rgb(0,0,0)'), name = titulo)
 
-    fig = go.Figure(data=grafico, layout=layout)
-    fig.add_trace(go.Scatter(x = max_valuesX, y = max_valuesY, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(color='rgb(0,0,255)',size=10),name = 'Valor Máximo'))
-    fig.add_trace(go.Scatter(x = min_valuesX, y = min_valuesY, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(color='rgb(255,0,0)',size=10), name = 'Valor Mínimo'))
-
-    py.plot(fig, auto_open=False)
+    return max_valuesX, max_valuesY, min_valuesX, min_valuesY
 
 #Plota um gráfico de linha a partir dos dois eixo dados
 #NÃO USADA

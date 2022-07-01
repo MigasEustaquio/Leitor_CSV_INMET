@@ -33,6 +33,7 @@ def tratamento_formato_data(lista_entries):
 
     datas=[]
     for entry in lista_entries:
+        print(entry.get())
         data=entry.get()
 
         # if data == '':
@@ -68,6 +69,12 @@ def tratamento_formato_data(lista_entries):
             datas.append(data)
 
     return datas
+
+def setListBox(listBox, list):
+        listBox.delete(0, END)
+
+        for element in list:
+            listBox.insert('end', element)
 
 class GraphicInterface(object): 
     def __init__(self):
@@ -265,6 +272,7 @@ class GraphicInterface(object):
         testeScreen.mainloop
 
     def op_intervalo_data(self, listBox):
+        self.opState = 'Inicio'
         self.opMes = None
         try:
             op = listBox.curselection()[0]
@@ -280,15 +288,9 @@ class GraphicInterface(object):
             
 
             if op == 0:#dia
+                self.opState = 'DataDia'
                 self.carregaMes()
-                print('nanana')
-                if self.opMes is not None:
-                    print('é pra ir')
-                    self.btnAvancar.configure(command = lambda: self.carregarDia())
-                print('chega ?')
                 
-                
-
             elif op == 1:#mes
                 self.carregaMes()
                 self.btnVoltar.configure(command = lambda: print('voltar ano mes'))
@@ -307,19 +309,19 @@ class GraphicInterface(object):
 
     def carregaMes(self):
         self.labelIntervalOP['text'] = 'Selecione o Mês'
-        self.listBoxIntervalOp.delete(0, END)
         self.dataFrameMeses = separar_dataframes(self.dataFrame, self.fuso)
-        for dataMes in list(self.dataFrameMeses.keys()):
-            self.listBoxIntervalOp.insert('end', dataMes)
+        setListBox(self.listBoxIntervalOp, self.dataFrameMeses.keys())
         
-        self.btnAvancar.configure(command = lambda: self.sececinarMes(self.listBoxIntervalOp))
+        self.btnAvancar.configure(command = lambda: self.selecionarMes(self.listBoxIntervalOp))
             
-    def sececinarMes(self, listBox):
+    def selecionarMes(self, listBox):
         try: 
             op = listBox.curselection()[0]
             self.opMes = listBox.get(op)
             print (self.opMes)
-            return
+            if(self.opState=='DataDia'):
+                self.carregarDia()
+                #self.btnAvancar.configure(command = lambda: self.carregarDia())
         except IndexError:
             showinfo(title='Erro', message='Selecione o mês')
             return
@@ -327,11 +329,11 @@ class GraphicInterface(object):
     def carregarDia(self):
         print(self.opMes, ' agora o dia')
         self.labelIntervalOP['text'] = 'Selecione o Dia'
-        #self.listBoxIntervalOp.delete(0, END)
-        self.dataFrameDias = self.dataFrameMeses[self.opMes]
-        print(self.dataFrameDias)
-        
-        
+        self.dataFrameDias = self.dataFrameMeses[self.opMes]       
+        dias=listaDias(self.dataFrameDias, self.fuso)
+        setListBox(self.listBoxIntervalOp, dias)
+        self.btnAvancar.configure(command = lambda: self.selecionarDia(self.listBoxIntervalOp))
+    
     def selecionarDia(self, listBox):
         
         try:
@@ -368,14 +370,13 @@ class GraphicInterface(object):
         for data in datas: msg+=' '+data
         print(msg)
 
-        try:
-            self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada)
-        except:
-            showinfo(title='Erro', message='Erro ao gerar gráfico') #erro genérico provisório
+        # try:
+        #     self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada)
+        # except:
+        #     showinfo(title='Erro', message='Erro ao gerar gráfico') #erro genérico provisório
+        self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada)
 
         
-        
-
 
     def cria_entry_data(self, testeScreen):
 
@@ -493,19 +494,28 @@ class GraphicInterface(object):
         for data in datas_referencia:
             print(data)
 
-        # if tipo_grafico == 0: # Gráfico Diário
-        #     showinfo(title='Erro', message='Não implementado')
-        #     return
+        if tipo_grafico == 0: # Gráfico Diário
+            showinfo(title='Erro', message='Não implementado')
+            return
 
-        # elif tipo_grafico == 1: # Gráfico Mensal
-        #     eixoY, eixoX = mediaDia(self.dataFrames[data_referencia], variavel_referencia, self.fuso)
+        elif tipo_grafico == 1: # Gráfico Mensal
 
-        # elif tipo_grafico == 2: # Gráfico Anual
-        #     showinfo(title='Erro', message='Não implementado')
-        #     return
+            eixoY=[]
+            eixoX=[]
 
-        # geraGraficoBonito(eixoX, 'Hora '+'(UTC'+self.fuso+')' , eixoY, variavel_referencia, 'Gráfico de '+ variavel_referencia + ' ' + data_referencia)
-        # tSV.main()
+            for i, data_referencia in enumerate(datas_referencia):
+                y, x = mediaDia(self.dataFrames[data_referencia], variavel_referencia, self.fuso)
+                eixoX.append(x)
+                eixoY.append(y)
+
+            numero_curvas=len(eixoY)
+
+        elif tipo_grafico == 2: # Gráfico Anual
+            showinfo(title='Erro', message='Não implementado')
+            return
+
+        geraGraficoBonito(eixoX, 'Hora '+'(UTC'+self.fuso+')' , eixoY, variavel_referencia, 'Gráfico de '+ variavel_referencia + ' ' + data_referencia, numero_curvas)
+        tSV.main()
 
 
 
