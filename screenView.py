@@ -240,7 +240,7 @@ class GraphicInterface(object):
         self.labelEntrys.grid(column=self.labelLabelsInfo['column']+2, row=0)
         self.labelEntrysInfo = self.labelEntrys.grid_info()
         
-        self.listBoxEntrys = Listbox(testeScreen, height=6, exportselection=0)
+        self.listBoxEntrys = Listbox(testeScreen, height=6, exportselection=0, width = 60)
         self.listBoxEntrys.grid(column=self.labelEntrysInfo['column'], row=self.labelEntrysInfo['row']+1, sticky='nwes')
         self.listBoxlabelEntrysInfo = self.listBoxEntrys.grid_info()
 
@@ -249,7 +249,7 @@ class GraphicInterface(object):
         self.scrollbarEntrys.grid(column=self.listBoxlabelEntrysInfo['column']+1, row=self.listBoxlabelEntrysInfo['row'], sticky='ns')
         self.scrollbarEntrysInfos = self.scrollbarIntervalOp.grid_info()
         
-        self.btnLimpar = Button(testeScreen, text='Limpar')
+        self.btnLimpar = Button(testeScreen, text='Limpar', command = lambda: self.listBoxEntrys.delete(0, END))
         self.btnLimpar.grid(row = self.listBoxlabelEntrysInfo['row']+1, column = self.listBoxlabelEntrysInfo['column'])
         self.btnLimparInfo = self.btnLimpar.grid_info()
         
@@ -264,19 +264,21 @@ class GraphicInterface(object):
         self.buttonAddEntry.grid(row=self.btnLimparInfo['row']+1, column=self.labelEntrysInfo['column'])
         self.buttonAddEntryInfo = self.buttonAddEntry.grid_info()
 
-        # self.entryDate = Entry(testeScreen)
-        # self.entryDate.grid(row=1, column=3)
-        self.cria_entry_data(testeScreen)
+        self.btnAdicionarListaEntradas = Button(testeScreen, text = 'Adicionar Entrada')
+        self.btnAdicionarListaEntradas.grid(row = self.listboxLabelsInfo['row']+1, column = self.listboxLabelsInfo['column'])
+        self.btnAdicionarListaEntradasInfo = self.btnAdicionarListaEntradas.grid_info()
+        self.btnAdicionarListaEntradas.grid_forget()
 
+        self.cria_entry_data(testeScreen)
 
         testeScreen.mainloop
 
     def op_intervalo_data(self, listBox):
         self.opState = 'Inicio'
-        self.opMes = None
         try:
             op = listBox.curselection()[0]
-            print(listBox.get(op))
+            self.tipoGrafico = listBox.get(op)
+            print(self.tipoGrafico)
             if (len(self.btnVoltar.grid_info()) == 0):
                 self.btnAvancar.grid_remove()
 
@@ -285,23 +287,33 @@ class GraphicInterface(object):
 
                 self.btnAvancarInfo['column'] = self.labelIntervalOPInfo['column']
                 self.showElement(self.btnAvancar, self.btnAvancarInfo)
-            
 
             if op == 0:#dia
                 self.opState = 'DataDia'
                 self.carregaMes()
-                
+                self.btnVoltar.configure(command = lambda: self.voltarDefault())
+
             elif op == 1:#mes
                 self.carregaMes()
-                self.btnVoltar.configure(command = lambda: print('voltar ano mes'))
+                self.btnVoltar.configure(command = lambda: self.voltarDefault())
 
             elif op == 2:#ano
                 self.selecionarAno()
-                self.btnVoltar.configure(command = lambda: print('voltar ano ano'))
+                self.btnVoltar.configure(command = lambda: self.voltarDefault())
         except IndexError:
             showinfo(title='Erro', message='Selecione um tipo de intervalo de entrada')
             return
         
+    def voltarDefault(self):
+        self.btnAdicionarListaEntradas.grid_remove()
+        self.labelIntervalOP['text'] = 'Opções'
+        self.listBoxIntervalOp.delete(0, END)
+        self.btnVoltar.grid_remove()
+        self.btnAvancar.grid_remove()
+        self.showElement(self.btnAvancar, self.btnVoltarInfo)
+        self.btnAvancar.configure(command = lambda: self.op_intervalo_data(self.listboxTipoGrafico))
+
+
     def selecionarAno(self):
         self.labelIntervalOP['text'] = 'Selecione o Ano'
         self.listBoxIntervalOp.delete(0, END)
@@ -313,6 +325,8 @@ class GraphicInterface(object):
         setListBox(self.listBoxIntervalOp, self.dataFrameMeses.keys())
         
         self.btnAvancar.configure(command = lambda: self.selecionarMes(self.listBoxIntervalOp))
+        self.btnVoltar.configure(command = lambda: self.voltarDefault())
+        self.btnAdicionarListaEntradas.grid_forget()
             
     def selecionarMes(self, listBox):
         try: 
@@ -321,7 +335,9 @@ class GraphicInterface(object):
             print (self.opMes)
             if(self.opState=='DataDia'):
                 self.carregarDia()
-                #self.btnAvancar.configure(command = lambda: self.carregarDia())
+            else:
+                self.showElement(self.btnAdicionarListaEntradas, self.btnAdicionarListaEntradasInfo)
+                self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToListBox([self.tipoGrafico, self.opMes], self.listboxLabels, self.listBoxEntrys))
         except IndexError:
             showinfo(title='Erro', message='Selecione o mês')
             return
@@ -335,18 +351,20 @@ class GraphicInterface(object):
         self.btnAvancar.configure(command = lambda: self.selecionarDia(self.listBoxIntervalOp))
     
     def selecionarDia(self, listBox):
-        
         try:
-            self.btnVoltar.configure(command = lambda: print('voltar dia'))
-            
+            op = listBox.curselection()[0]
+            self.opDia = listBox.get(op)
+            print (self.opDia)
+
+            self.btnVoltar.configure(command = lambda: self.carregaMes())
+            self.showElement(self.btnAdicionarListaEntradas, self.btnAdicionarListaEntradasInfo)
+            self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToListBox([self.tipoGrafico, self.opDia], self.listboxLabels, self.listBoxEntrys))
         except IndexError:
             showinfo(title='Erro', message='Selecione o dia')
-            self.carregaMes()
             return
         
     
     def itens_selecionados(self):
-
         try:
             tipo_selecionado = self.listboxTipoGrafico.curselection()[0]
         except:
@@ -376,7 +394,20 @@ class GraphicInterface(object):
         #     showinfo(title='Erro', message='Erro ao gerar gráfico') #erro genérico provisório
         self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada)
 
-        
+    def addEntryToListBox(self, info, listBoxCheck, listBoxInsert):
+        try:
+            op = listBoxCheck.curselection()[0]
+            entry = [info, listBoxCheck.get(op)]
+            entryText = 'Informaçoes; Data: '
+            for i in info:
+                entryText += i+' '
+            entryText +='; Variavel: '+listBoxCheck.get(op)
+            listBoxInsert.insert('end', entryText)
+            print(entryText)
+            self.voltarDefault()
+        except IndexError:
+            showinfo(title='Erro', message='Selecione o parâmetro indicado')
+            return
 
     def cria_entry_data(self, testeScreen):
 

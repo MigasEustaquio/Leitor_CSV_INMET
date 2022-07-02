@@ -126,8 +126,6 @@ def separar_dataframes(df, fuso):
 
     meses_e_indicesDF=sorted(meses_e_indicesDF.keys(), key=lambda date: datetime.datetime.strptime(date, "%m/%Y"))
 
-    #sorted(listaDias, key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y"))
-
     for i, mes in enumerate(meses_e_indicesDF):
         dicionario_de_meses[mes] = dfs[i]
 
