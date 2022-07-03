@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
+from tkinter import ttk
 from tkinter.messagebox import showinfo
+from numpy import empty
 import pandas as pd
 import re
 
@@ -76,13 +78,39 @@ def setListBox(listBox, list):
         for element in list:
             listBox.insert('end', element)
 
-def removeSelectedEntry(listBox):
+def removeListBoxSelectedEntry(listBox):
     try:
         idxItem = listBox.curselection()[0]
         listBox.delete(idxItem)
     except IndexError:
         showinfo(title='Erro', message='Nenhuma entrada selecionada')
         return
+
+def removeTreeViewSelectedEntry(tree):
+    try:
+        idxItem = tree.selection()[0]
+        tree.delete(idxItem)
+    except IndexError:
+        showinfo(title='Erro', message='Nenhuma entrada selecionada')
+        return    
+
+def getTreeViewSelectedEntry(tree):
+    try:
+        idxItem = tree.selection()[0]
+        print(idxItem)
+        print(tree.item(idxItem, 'values'))
+    except IndexError:
+       showinfo(title='Erro', message='Nenhuma entrada selecionada')
+
+def getAllTreeViewEntrys(tree):
+    print(tree.get_children())
+    if len(tree.get_children())==0:
+        return
+    else: 
+        for idxItem in tree.get_children():
+            print(tree.item(idxItem, 'values'))
+   
+
 
 class GraphicInterface(object): 
     def __init__(self):
@@ -248,33 +276,49 @@ class GraphicInterface(object):
         self.labelEntrys.grid(column=self.labelLabelsInfo['column']+2, row=0)
         self.labelEntrysInfo = self.labelEntrys.grid_info()
         
-        self.listBoxEntrys = Listbox(testeScreen, height=6, exportselection=0, width = 60)
-        self.listBoxEntrys.grid(column=self.labelEntrysInfo['column'], row=self.labelEntrysInfo['row']+1, sticky='nwes')
-        self.listBoxlabelEntrysInfo = self.listBoxEntrys.grid_info()
+        self.treeViewEntrys = ttk.Treeview(testeScreen, column=("c1", "c2", "c3"), show='headings', height=5)
+        self.treeViewEntrys.column("# 1", anchor=CENTER, width = 50)
+        self.treeViewEntrys.heading("# 1", text="Tipo")
+        self.treeViewEntrys.column("# 2", anchor=CENTER, width = 100)
+        self.treeViewEntrys.heading("# 2", text="Data")
+        self.treeViewEntrys.column("# 3", anchor=CENTER,  width = 150)
+        self.treeViewEntrys.heading("# 3", text="Variável")
+        self.treeViewEntrys.grid(column=self.labelEntrysInfo['column'], row=self.labelEntrysInfo['row']+1, sticky='nwes')
+        self.treeViewEntrysInfo = self.treeViewEntrys.grid_info()
 
-        self.scrollbarEntrys = Scrollbar(testeScreen, orient='vertical', command=self.listBoxEntrys.yview)
-        self.listBoxEntrys['yscrollcommand'] = self.scrollbarEntrys.set
-        self.scrollbarEntrys.grid(column=self.listBoxlabelEntrysInfo['column']+1, row=self.listBoxlabelEntrysInfo['row'], sticky='ns')
-        self.scrollbarEntrysInfo = self.scrollbarEntrys.grid_info()
+        self.scrollbarTreeViewEntrys = Scrollbar(testeScreen, orient='vertical', command = self.treeViewEntrys.yview)
+        self.treeViewEntrys['yscrollcommand'] = self.treeViewEntrys.set
+        self.scrollbarTreeViewEntrys.grid(column=self.treeViewEntrysInfo['column']+1, row=self.treeViewEntrysInfo['row'], sticky='ns')
+        self.scrollbarTreeViewEntrysInfo = self.scrollbarTreeViewEntrys.grid_info()
+
+
+        # self.listBoxEntrys = Listbox(testeScreen, height=6, exportselection=0, width = 60)
+        # self.listBoxEntrys.grid(column=self.labelEntrysInfo['column'], row=self.labelEntrysInfo['row']+1, sticky='nwes')
+        # self.listBoxlabelEntrysInfo = self.listBoxEntrys.grid_info()
+
+        # self.scrollbarEntrys = Scrollbar(testeScreen, orient='vertical', command=self.listBoxEntrys.yview)
+        # self.listBoxEntrys['yscrollcommand'] = self.scrollbarEntrys.set
+        # self.scrollbarEntrys.grid(column=self.listBoxlabelEntrysInfo['column']+1, row=self.listBoxlabelEntrysInfo['row'], sticky='ns')
+        # self.scrollbarEntrysInfo = self.scrollbarEntrys.grid_info()
         
 
         self.btnsEntrysContainer = Frame(testeScreen)
-        self.btnsEntrysContainer.grid(row = self.scrollbarEntrysInfo['row'], column = self.scrollbarEntrysInfo['column']+1)
+        self.btnsEntrysContainer.grid(row = self.scrollbarTreeViewEntrysInfo['row'], column = self.scrollbarTreeViewEntrysInfo['column']+1)
         self.btnsEntrysContainerInfo =  self.btnsEntrysContainer.grid_info()
         
-        self.btnLimpar = Button(self.btnsEntrysContainer, text='Limpar Entradas', command = lambda: self.listBoxEntrys.delete(0, END))
+        self.btnLimpar = Button(self.btnsEntrysContainer, text='Remover Todas Entradas', command = lambda: self.treeViewEntrys.delete(*self.treeViewEntrys.get_children()))
         self.btnLimpar.grid(row = 0, column = 0, sticky = NW)
         self.btnLimparInfo = self.btnLimpar.grid_info()
         
-        self.btnRemoverElemento = Button(self.btnsEntrysContainer, text='Remover Entrada', command = lambda: removeSelectedEntry(self.listBoxEntrys))
+        self.btnRemoverElemento = Button(self.btnsEntrysContainer, text='Remover Entrada Selecionada', command = lambda: removeTreeViewSelectedEntry(self.treeViewEntrys))
         self.btnRemoverElemento.grid(row = self.btnLimparInfo['row']+1, column = 0, sticky = NW)
         self.btnRemoverElementoInfo = self.btnRemoverElemento.grid_info()
 
-        self.btnGerarGraficoElemento = Button(self.btnsEntrysContainer, text='Plotar Gráfico')
+        self.btnGerarGraficoElemento = Button(self.btnsEntrysContainer, text='Plotar Gráfico para Entrada Selecionada', command = lambda: getTreeViewSelectedEntry(self.treeViewEntrys))
         self.btnGerarGraficoElemento.grid(row = self.btnRemoverElementoInfo['row']+1, column = 0, sticky = NW)
         self.btnGerarGraficoElementoInfo = self.btnGerarGraficoElemento.grid_info()
 
-        self.btnGerarGraficoTodosElementos = Button(self.btnsEntrysContainer, text='Plotar Gráfico com Todas Entradas')
+        self.btnGerarGraficoTodosElementos = Button(self.btnsEntrysContainer, text='Plotar Gráfico com Todas Entradas', command = lambda: getAllTreeViewEntrys(self.treeViewEntrys))
         self.btnGerarGraficoTodosElementos.grid(row = self.btnGerarGraficoElementoInfo['row']+1, column = 0, sticky = NW)
         self.btnGerarGraficoTodosElementosInfo = self.btnGerarGraficoTodosElementos.grid_info()
         
@@ -286,7 +330,7 @@ class GraphicInterface(object):
         self.btnVoltar = Button(testeScreen, text = 'Voltar', command = lambda: print('voltar'))
 
         self.buttonAddEntry = Button(testeScreen, text='Adicionar Linha', command=lambda: self.cria_entry_data(testeScreen))
-        self.buttonAddEntry.grid(row=self.listBoxlabelEntrysInfo['row']+1, column=self.listBoxlabelEntrysInfo['column'])
+        self.buttonAddEntry.grid(row=self.treeViewEntrysInfo['row']+1, column=self.treeViewEntrysInfo['column'])
         self.buttonAddEntryInfo = self.buttonAddEntry.grid_info()
 
         self.btnAdicionarListaEntradas = Button(testeScreen, text = 'Adicionar Entrada')
@@ -362,7 +406,9 @@ class GraphicInterface(object):
                 self.carregarDia()
             else:
                 self.showElement(self.btnAdicionarListaEntradas, self.btnAdicionarListaEntradasInfo)
-                self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToListBox([self.tipoGrafico, self.opMes], self.listboxLabels, self.listBoxEntrys))
+                #self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToListBox([self.tipoGrafico, self.opMes], self.listboxLabels, self.listBoxEntrys))
+                self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToTreeViewEntrys(self.tipoGrafico, self.opMes))
+                
         except IndexError:
             showinfo(title='Erro', message='Selecione o mês')
             return
@@ -383,7 +429,8 @@ class GraphicInterface(object):
 
             self.btnVoltar.configure(command = lambda: self.carregaMes())
             self.showElement(self.btnAdicionarListaEntradas, self.btnAdicionarListaEntradasInfo)
-            self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToListBox([self.tipoGrafico, self.opDia], self.listboxLabels, self.listBoxEntrys))
+            #self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToListBox([self.tipoGrafico, self.opDia], self.listboxLabels, self.listBoxEntrys))
+            self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToTreeViewEntrys(self.tipoGrafico, self.opDia))
         except IndexError:
             showinfo(title='Erro', message='Selecione o dia')
             return
@@ -419,19 +466,29 @@ class GraphicInterface(object):
         #     showinfo(title='Erro', message='Erro ao gerar gráfico') #erro genérico provisório
         self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada)
 
-    def addEntryToListBox(self, info, listBoxCheck, listBoxInsert):
+    # def addEntryToListBox(self, info, listBoxCheck, listBoxInsert):
+    #     try:
+    #         op = listBoxCheck.curselection()[0]
+    #         entry = [info, listBoxCheck.get(op)]
+    #         entryText = 'Informaçoes; Data: '
+    #         for i in info:
+    #             entryText += i+' '
+    #         entryText +='; Variavel: '+listBoxCheck.get(op)
+    #         listBoxInsert.insert('end', entryText)
+    #         print(entryText)
+    #         self.voltarDefault()
+    #     except IndexError:
+    #         showinfo(title='Erro', message='Selecione o parâmetro indicado')
+    #         return
+    
+    def addEntryToTreeViewEntrys(self, tipo, data):
         try:
-            op = listBoxCheck.curselection()[0]
-            entry = [info, listBoxCheck.get(op)]
-            entryText = 'Informaçoes; Data: '
-            for i in info:
-                entryText += i+' '
-            entryText +='; Variavel: '+listBoxCheck.get(op)
-            listBoxInsert.insert('end', entryText)
-            print(entryText)
-            self.voltarDefault()
+           idxItem = self.listboxLabels.curselection()[0]
+           variavel = self.listboxLabels.get(idxItem)
+           self.treeViewEntrys.insert('','end', values=(tipo, data, variavel))
+           self.voltarDefault()
         except IndexError:
-            showinfo(title='Erro', message='Selecione o parâmetro indicado')
+            showinfo(title='Erro', message='Selecione uma Variável')
             return
 
     def cria_entry_data(self, testeScreen):
