@@ -76,6 +76,14 @@ def setListBox(listBox, list):
         for element in list:
             listBox.insert('end', element)
 
+def removeSelectedEntry(listBox):
+    try:
+        idxItem = listBox.curselection()[0]
+        listBox.delete(idxItem)
+    except IndexError:
+        showinfo(title='Erro', message='Nenhuma entrada selecionada')
+        return
+
 class GraphicInterface(object): 
     def __init__(self):
 
@@ -247,11 +255,28 @@ class GraphicInterface(object):
         self.scrollbarEntrys = Scrollbar(testeScreen, orient='vertical', command=self.listBoxEntrys.yview)
         self.listBoxEntrys['yscrollcommand'] = self.scrollbarEntrys.set
         self.scrollbarEntrys.grid(column=self.listBoxlabelEntrysInfo['column']+1, row=self.listBoxlabelEntrysInfo['row'], sticky='ns')
-        self.scrollbarEntrysInfos = self.scrollbarIntervalOp.grid_info()
+        self.scrollbarEntrysInfo = self.scrollbarEntrys.grid_info()
         
-        self.btnLimpar = Button(testeScreen, text='Limpar', command = lambda: self.listBoxEntrys.delete(0, END))
-        self.btnLimpar.grid(row = self.listBoxlabelEntrysInfo['row']+1, column = self.listBoxlabelEntrysInfo['column'])
+
+        self.btnsEntrysContainer = Frame(testeScreen)
+        self.btnsEntrysContainer.grid(row = self.scrollbarEntrysInfo['row'], column = self.scrollbarEntrysInfo['column']+1)
+        self.btnsEntrysContainerInfo =  self.btnsEntrysContainer.grid_info()
+        
+        self.btnLimpar = Button(self.btnsEntrysContainer, text='Limpar Entradas', command = lambda: self.listBoxEntrys.delete(0, END))
+        self.btnLimpar.grid(row = 0, column = 0, sticky = NW)
         self.btnLimparInfo = self.btnLimpar.grid_info()
+        
+        self.btnRemoverElemento = Button(self.btnsEntrysContainer, text='Remover Entrada', command = lambda: removeSelectedEntry(self.listBoxEntrys))
+        self.btnRemoverElemento.grid(row = self.btnLimparInfo['row']+1, column = 0, sticky = NW)
+        self.btnRemoverElementoInfo = self.btnRemoverElemento.grid_info()
+
+        self.btnGerarGraficoElemento = Button(self.btnsEntrysContainer, text='Plotar Gráfico')
+        self.btnGerarGraficoElemento.grid(row = self.btnRemoverElementoInfo['row']+1, column = 0, sticky = NW)
+        self.btnGerarGraficoElementoInfo = self.btnGerarGraficoElemento.grid_info()
+
+        self.btnGerarGraficoTodosElementos = Button(self.btnsEntrysContainer, text='Plotar Gráfico com Todas Entradas')
+        self.btnGerarGraficoTodosElementos.grid(row = self.btnGerarGraficoElementoInfo['row']+1, column = 0, sticky = NW)
+        self.btnGerarGraficoTodosElementosInfo = self.btnGerarGraficoTodosElementos.grid_info()
         
 
         self.btnAvancar = Button(testeScreen, text='Avançar', command = lambda: self.op_intervalo_data(self.listboxTipoGrafico))
@@ -261,7 +286,7 @@ class GraphicInterface(object):
         self.btnVoltar = Button(testeScreen, text = 'Voltar', command = lambda: print('voltar'))
 
         self.buttonAddEntry = Button(testeScreen, text='Adicionar Linha', command=lambda: self.cria_entry_data(testeScreen))
-        self.buttonAddEntry.grid(row=self.btnLimparInfo['row']+1, column=self.labelEntrysInfo['column'])
+        self.buttonAddEntry.grid(row=self.listBoxlabelEntrysInfo['row']+1, column=self.listBoxlabelEntrysInfo['column'])
         self.buttonAddEntryInfo = self.buttonAddEntry.grid_info()
 
         self.btnAdicionarListaEntradas = Button(testeScreen, text = 'Adicionar Entrada')
