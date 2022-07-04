@@ -16,7 +16,7 @@ def main():
 
     # print('COMPLETO ',df)
 
-    dicionario_de_meses = separar_dataframes(df, FUSO_HORARIO)
+    dicionario_de_meses = separar_dataframes_mes(df, FUSO_HORARIO)
     # print(dicionario_de_meses)
 
     # print(list(dicionario_de_meses.keys()))
@@ -26,7 +26,7 @@ def main():
 
     # print(dicionario_de_meses[MES_DE_REFERENCIA])
     mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses[MES_DE_REFERENCIA], 'Radiacao (Jh/m²)', FUSO_HORARIO)
-    geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+FUSO_HORARIO+')' , mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação média o do Mês')
+    geraGraficoBonito([horasDoDia], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora], ['Radiação (Jh/m²)'], ['Gráfico da radiação média o do Mês' + MES_DE_REFERENCIA])
 
 def radiacaoMediaValida(df, dicionario_de_meses, mes):
     dias = listaDias(dicionario_de_meses[mes], FUSO_HORARIO)

@@ -52,6 +52,7 @@ import pandas as pd
 import plotly.graph_objs as go
 import plotly.offline as py
 import numpy as np
+from dataView import *
 
 def graficoBonito():
     # Gráfico usando apenas marcadores
@@ -77,17 +78,102 @@ import test_screenView as testSV
 from manipulaDataFame import *
 from manipulaAquivo import *
 
+NOMES_ARQUIVOS=['GOIANIA (A002)_2022-05-01_2022-05-31', 'GOIANIA (A002)_2022-04-01_2022-04-30', 'GOIANIA (A002)_2022-01-01_2022-03-31']
+FUSO_HORARIO='-3'
 def test():
+    dfs = ler_arquivos('arquivos/',NOMES_ARQUIVOS)
+    df = concatenar_dfs(dfs)
+    df = string_para_numerico(df)
+    df = definir_fuso_horario(df, FUSO_HORARIO)
+    df = addTempMedia(df)
+    df = KJ_to_KWh(df)
 
-    # dfs = ler_arquivos('arquivos/',['GOIANIA (A002)_2022-04-01_2022-04-30'])
-    # df = concatenar_dfs(dfs)
-    # df = string_para_numerico(df)
+    #TestesDataViewMeses(df)
+    #TestesDataViewDias(df)
+    #TestesDataViewAnos(df)
 
-    # df = definir_fuso_horario(df, '-5')
+    df_em_meses = separar_dataframes_mes(df, FUSO_HORARIO)
+    df_em_dias = separar_dataframes_dia(df, FUSO_HORARIO)
+    df_em_anos = separar_dataframes_ano(df, FUSO_HORARIO)
 
-    # print(df)
+    mes1='04/2022'
+    mediaPorHora1, horasDoDia1 = mediaDia(df_em_meses[mes1], 'Radiacao (Jh/m²)', FUSO_HORARIO)
+    variavel1='Radiação (Jh/m²)'
+    t1=f'Gráfico {variavel1} do Mês: {mes1}'
 
-    graficoBonito()
+    dia2='13/04/2022'
+    mediaPorHora2, horasDoDia2 = mediaDia(df_em_dias[dia2], 'Radiacao (Jh/m²)', FUSO_HORARIO)
+    variavel2='Radiação (Jh/m²)'
+    t2=f'Gráfico {variavel2} do dia: {dia2}'
+
+    ano3='2022'
+    mediaPorHora3, horasDoDia3 = mediaDia(df_em_anos[ano3], 'Radiacao (Jh/m²)', FUSO_HORARIO)
+    variavel3='Radiação (Jh/m²)'
+    t3=f'Gráfico {variavel3} do ano: {ano3}'
+
+    variaveis=[variavel1, variavel2, variavel3]
+    variaveis = set(variaveis)
+    geraGraficoBonito([horasDoDia1, horasDoDia2, horasDoDia3], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora1, mediaPorHora2, mediaPorHora3], variaveis, [t1, t2, t3], numero_curvas=3)
+
+def TestesDataViewAnos(df):
+    df_em_anos = separar_dataframes_ano(df, FUSO_HORARIO)
+    print(df_em_anos.keys())
+
+    ano1='2021'
+    mediaPorHora1, horasDoDia1 = mediaDia(df_em_anos[ano1], 'Radiacao (Jh/m²)', FUSO_HORARIO)
+    variavel1='Radiação (Jh/m²)'
+    t1=f'Gráfico {variavel1} do Ano: {ano1}'
+    ano2='2022'
+    mediaPorHora2, horasDoDia2 = mediaDia(df_em_anos[ano2], 'Radiacao (Jh/m²)', FUSO_HORARIO)
+    variavel2='Radiação (Jh/m²)'
+    t2=f'Gráfico {variavel2} do ano: {ano2}'
+
+    variaveis=[variavel1, variavel2]
+    variaveis = set(variaveis)
+    geraGraficoBonito([horasDoDia1, horasDoDia2], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora1, mediaPorHora2], variaveis, [t1, t2], numero_curvas=2)
+
+
+
+def TestesDataViewDias(df):
+    df_em_meses = separar_dataframes_mes(df, FUSO_HORARIO)
+    mes1='01/2022'
+    df_em_dias = separar_dataframes_dia(df, FUSO_HORARIO)
+    #print(df_em_dias)
+    print(df_em_dias.keys())
+
+
+    dia1='31/12/2021'
+    mediaPorHora1, horasDoDia1 = mediaDia(df_em_dias[dia1], 'Radiacao (Jh/m²)', FUSO_HORARIO)
+    variavel1='Radiação (Jh/m²)'
+    t1=f'Gráfico {variavel1} do dia: {dia1}'
+    dia2='13/01/2022'
+    mediaPorHora2, horasDoDia2 = mediaDia(df_em_dias[dia2], 'Radiacao (Jh/m²)', FUSO_HORARIO)
+    variavel2='Radiação (Jh/m²)'
+    t2=f'Gráfico {variavel2} do dia: {dia2}'
+
+
+    variaveis=[variavel1, variavel2]
+    variaveis = set(variaveis)
+    geraGraficoBonito([horasDoDia1, horasDoDia2], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora1, mediaPorHora2], variaveis, [t1, t2], numero_curvas=2)
+
+    #geraGraficoBonito([horasDoDia1], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora1], [variavel1], [t1], numero_curvas=1)
+
+def TestesDataViewMeses(df):
+    df_em_meses = separar_dataframes_mes(df, FUSO_HORARIO)
+
+    mes1='01/2022'
+    mediaPorHora1, horasDoDia1 = mediaDia(df_em_meses[mes1], 'Radiacao (Jh/m²)', FUSO_HORARIO)
+    variavel1='Radiação (Jh/m²)'
+    t1=f'Gráfico {variavel1} do Mês: {mes1}'
+    mes2='04/2022'
+    mediaPorHora2, horasDoDia2 = mediaDia(df_em_meses[mes2], 'Radiacao (Jh/m²)', FUSO_HORARIO)
+    variavel2='Radiação (Jh/m²)'
+    t2=f'Gráfico {variavel2} do do Mês: {mes2}'
+    
+
+    variaveis=[variavel1, variavel2]
+    variaveis = set(variaveis)
+    geraGraficoBonito([horasDoDia1, horasDoDia2], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora1, mediaPorHora2], variaveis, [t1, t2], numero_curvas=2)
 
 if __name__ == '__main__':
 

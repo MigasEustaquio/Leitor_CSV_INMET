@@ -13,30 +13,34 @@ def geraGrafico(eixoX, legendaX, eixoY, legendaY, titulo):
 
 #Plota gráfico utilizando recursos da biblioteca plotly
 def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, numero_curvas=1):    
-   
-    layout = go.Layout(title=titulo, yaxis={'title':legendaY},xaxis={'title': legendaX})
+    titulos=''
+    variaveis=''
+    for i in titulo:
+        titulos += i+'<br>'
+    for i in legendaY:
+        variaveis += i+'<br>'
+
+    layout = go.Layout(title=titulos, yaxis={'title':variaveis},xaxis={'title': legendaX})
     
     for curva in range(numero_curvas):
-
         max_valuesX, max_valuesY, min_valuesX, min_valuesY = get_max_min(eixoX[curva], eixoY[curva])
 
         if curva == 0:
-
-            grafico = go.Scatter(x = eixoX[curva], y = eixoY[curva], mode = 'markers+lines', line=dict(color='rgb(0,0,0)'), name = titulo)
+            grafico = go.Scatter(x = eixoX[curva], y = eixoY[curva], mode = 'markers+lines', line=dict(color='rgb(0,0,0)'), name = titulo[curva])
 
             fig = go.Figure(data=grafico, layout=layout)
-            fig.add_trace(go.Scatter(x = max_valuesX, y = max_valuesY, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(color='rgb(0,0,255)',size=10),name = 'Valor Máximo'))
-            fig.add_trace(go.Scatter(x = min_valuesX, y = min_valuesY, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(color='rgb(255,0,0)',size=10), name = 'Valor Mínimo'))
+            fig.add_trace(go.Scatter(x = max_valuesX, y = max_valuesY, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(size=10),name = 'Valor Máximo '+titulo[curva]))
+            fig.add_trace(go.Scatter(x = min_valuesX, y = min_valuesY, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(size=10), name = 'Valor Mínimo '+titulo[curva]))
 
         else:
 
-            fig.add_trace(go.Scatter(x = eixoX[curva], y = eixoY[curva], mode = 'markers+lines', name = titulo))
+            fig.add_trace(go.Scatter(x = eixoX[curva], y = eixoY[curva], mode = 'markers+lines', name = titulo[curva]))
             
-            fig.add_trace(go.Scatter(x = max_valuesX, y = max_valuesY, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(color='rgb(0,0,255)',size=10),name = 'Valor Máximo'))
-            fig.add_trace(go.Scatter(x = min_valuesX, y = min_valuesY, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(color='rgb(255,0,0)',size=10), name = 'Valor Mínimo'))
+            fig.add_trace(go.Scatter(x = max_valuesX, y = max_valuesY, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(size=10),name = 'Valor Máximo '+titulo[curva]))
+            fig.add_trace(go.Scatter(x = min_valuesX, y = min_valuesY, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(size=10), name = 'Valor Mínimo '+titulo[curva]))
 
 
-    py.plot(fig, auto_open=False)
+    py.plot(fig, auto_open=True)
 
 def get_max_min(eixoX, eixoY):
     max_value = max(eixoY)

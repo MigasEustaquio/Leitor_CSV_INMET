@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import datetime
+import re
 
 #Muda o tipo dos dados do df de string para numerico
 def string_para_numerico(df):
@@ -100,10 +101,10 @@ def listaDias(df, fuso):
 
     dias = df['Date '+formato_fuso].values
     listaDias=list(set(dias))
-    print(listaDias)
+    
     return sorted(listaDias, key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y"))
 
-def separar_dataframes(df, fuso):
+def separar_dataframes_mes(df, fuso):
     mes_e_ano=''
 
     formato_fuso='(UTC'+fuso+')'
@@ -135,3 +136,38 @@ def concatenar_dfs(dfs):
     fullDf=pd.concat(dfs)
     # fullDf = fullDf.sort_values(by=['Data', 'Hora (UTC)'])
     return fullDf
+
+def separar_dataframes_dia(df, fuso):
+    formato_fuso='(UTC'+fuso+')'
+    dias = set(df['Date '+formato_fuso].values)
+    dias = sorted(dias, key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y"))
+
+    groups  = df.groupby(df['Date '+formato_fuso])
+    dicionario_de_dias={}
+    for dia in dias:
+        df_dia = groups.get_group(dia)
+        dicionario_de_dias[dia] = df_dia
+
+    return dicionario_de_dias
+
+def separar_dataframes_ano(df, fuso):
+    formato_fuso='(UTC'+fuso+')'
+    dias = set(df['Date '+formato_fuso].values)
+
+    ano=''
+    anos=[]
+    for dia in dias:
+        ano = dia.split('/')[2]
+        anos.append(ano)
+    anos=sorted(set(anos))
+
+    groupsLsit=[]
+    for ano in anos:
+        groups  = df.groupby(df['Date '+formato_fuso].str.contains('/'+ano)) # key: True or False
+        groupsLsit.append(groups)
+
+    dicionario_de_anos={}
+    for i, groups in enumerate(groupsLsit):
+        dicionario_de_anos[anos[i]] = groups.get_group(True)
+    
+    return dicionario_de_anos

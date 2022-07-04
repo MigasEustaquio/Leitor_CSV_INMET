@@ -390,7 +390,7 @@ class GraphicInterface(object):
 
     def carregaMes(self):
         self.labelIntervalOP['text'] = 'Selecione o Mês'
-        self.dataFrameMeses = separar_dataframes(self.dataFrame, self.fuso)
+        self.dataFrameMeses = separar_dataframes_mes(self.dataFrame, self.fuso)
         setListBox(self.listBoxIntervalOp, self.dataFrameMeses.keys())
         
         self.btnAvancar.configure(command = lambda: self.selecionarMes(self.listBoxIntervalOp))
@@ -566,7 +566,7 @@ class GraphicInterface(object):
 
 # Separa o Dataframe completo em um df por mês de referência
     def splitDataFrame(self):
-        self.dataFrames = separar_dataframes(self.dataFrame, self.fuso)
+        self.dataFrames = separar_dataframes_mes(self.dataFrame, self.fuso)
         self.dataFrameSeparado=True
 
 # Criando lista de botões associados aos meses
