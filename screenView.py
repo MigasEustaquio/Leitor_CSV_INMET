@@ -257,6 +257,8 @@ class GraphicInterface(object):
             else:
                 self.listboxLabels.insert('end', label)
 
+        self.listboxLabels.insert('end', 'Horas de Sol Pleno (HSP)')
+
 
         self.scrollbarLabels = Scrollbar(testeScreen, orient='vertical', command=self.listboxLabels.yview)
         self.listboxLabels['yscrollcommand'] = self.scrollbarLabels.set
@@ -460,6 +462,11 @@ class GraphicInterface(object):
         for data in datas: msg+=' '+data
         print(msg)
 
+        if variavel_selecionada == 'Horas de Sol Pleno (HSP)':
+            if len(datas)>1:
+                showinfo(title='Erro', message='Para verificar as horas de sol pleno selecione apenas uma data')
+                return
+
         # try:
         #     self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada)
         # except:
@@ -616,18 +623,25 @@ class GraphicInterface(object):
             eixoY=[]
             eixoX=[]
 
-            for i, data_referencia in enumerate(datas_referencia):
-                y, x = mediaDia(self.dataFrames[data_referencia], variavel_referencia, self.fuso)
+            for data_referencia in datas_referencia:
+                if variavel_referencia == 'Horas de Sol Pleno (HSP)':
+                    y, x = mediaDia(self.dataFrames[data_referencia], 'Radiacao (Jh/m²)', self.fuso)
+                else:
+                    y, x = mediaDia(self.dataFrames[data_referencia], variavel_referencia, self.fuso)
                 eixoX.append(x)
                 eixoY.append(y)
 
             numero_curvas=len(eixoY)
+            legendaX='Hora '+'(UTC'+self.fuso+')'
 
         elif tipo_grafico == 2: # Gráfico Anual
             showinfo(title='Erro', message='Não implementado')
             return
 
-        geraGraficoBonito(eixoX, 'Hora '+'(UTC'+self.fuso+')' , eixoY, variavel_referencia, 'Gráfico de '+ variavel_referencia + ' ' + data_referencia, numero_curvas)
+        if variavel_referencia == 'Horas de Sol Pleno (HSP)':
+            geraGraficoHSP(eixoX, legendaX, eixoY[0], variavel_referencia)
+        else:
+            geraGraficoBonito(eixoX, legendaX, eixoY, variavel_referencia, 'Gráfico de '+ variavel_referencia + ' ' + data_referencia, numero_curvas)
         tSV.main()
 
 
