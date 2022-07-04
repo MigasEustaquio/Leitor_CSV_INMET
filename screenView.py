@@ -7,8 +7,8 @@ from numpy import empty
 import pandas as pd
 import re
 
-from manipulaDataFame import *
-from dataView import *
+from util.manipulaDataFame import *
+from util.dataView import *
 import test_screenView as tSV
 
 

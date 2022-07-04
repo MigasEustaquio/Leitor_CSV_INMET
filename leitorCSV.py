@@ -1,6 +1,6 @@
-from dataView import *
-from manipulaAquivo import ler_arquivos
-from manipulaDataFame import *
+from util.dataView import *
+from util.manipulaAquivo import ler_arquivos
+from util.manipulaDataFame import *
 
 NOMES_ARQUIVOS=[ 'GOIANIA (A002)_2022-05-01_2022-05-31', 'GOIANIA (A002)_2022-04-01_2022-04-30']
 MES_DE_REFERENCIA='04/2022'

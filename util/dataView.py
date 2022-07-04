@@ -3,7 +3,7 @@ import plotly.graph_objs as go
 import plotly.offline as py
 import numpy as np
 
-from funcoesDiversas import *
+from util.funcoesDiversas import *
 
 #Plota um gráfico de linha a partir dos parametros passados
 def geraGrafico(eixoX, legendaX, eixoY, legendaY, titulo):

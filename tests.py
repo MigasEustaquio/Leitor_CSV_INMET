@@ -52,7 +52,7 @@ import pandas as pd
 import plotly.graph_objs as go
 import plotly.offline as py
 import numpy as np
-from dataView import *
+from util.dataView import *
 
 def graficoBonito():
     # Gráfico usando apenas marcadores
@@ -75,8 +75,8 @@ def graficoBonito():
 
 
 import test_screenView as testSV
-from manipulaDataFame import *
-from manipulaAquivo import *
+from util.manipulaDataFame import *
+from util.manipulaAquivo import *
 
 NOMES_ARQUIVOS=['GOIANIA (A002)_2022-05-01_2022-05-31', 'GOIANIA (A002)_2022-04-01_2022-04-30', 'GOIANIA (A002)_2022-01-01_2022-03-31']
 FUSO_HORARIO='-3'
