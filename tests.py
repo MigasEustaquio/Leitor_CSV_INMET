@@ -74,7 +74,7 @@ def graficoBonito():
     py.plot(data, auto_open=False)
 
 
-import test_screenView as testSV
+import util.graphicWindow as GW
 from util.manipulaDataFame import *
 from util.manipulaAquivo import *
 

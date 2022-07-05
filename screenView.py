@@ -7,7 +7,7 @@ from tkinter.messagebox import showinfo
 
 from util.manipulaDataFame import *
 from util.dataView import *
-import test_screenView as tSV
+import util.graphicWindow as GW
 
 
 def getFiles(fullpaths):
@@ -606,7 +606,7 @@ class GraphicInterface(object):
         print(self.dataFrames[key_referencia])
         print('NOME: ', nome_referencia)
         geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (KWh/m²)', 'Gráfico da radiação '+nome_referencia)
-        tSV.main()
+        GW.main()
 
 
 #Tornar possível fazer gráfico com várias variávei
@@ -650,7 +650,7 @@ class GraphicInterface(object):
             geraGraficoHSP(eixoX, legendaX, eixoY[0], variavel_referencia)
         else:
             geraGraficoBonito(eixoX, legendaX, eixoY, variavel_referencia, 'Gráfico de '+ variavel_referencia + ' ' + data_referencia, numero_curvas)
-        tSV.main()
+        GW.main()
 
 
 
