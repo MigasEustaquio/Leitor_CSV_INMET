@@ -32,43 +32,41 @@ def tratamento_formato_data(lista_entries):
     padrao_ano = re.compile("[0-9]{4}")
 
     datas=[]
-    for entry in lista_entries:
+    for i, entry in enumerate(lista_entries):
         print(entry.get())
         data=entry.get()
-
-        # if data == '':
-        #     print('Nenhuma data foi selecionada')
-        # else:
-        #     data_completa = data.split('/')
-        #     if len(data_completa)==1:
-        #         print('Ano')
-        #     elif len(data_completa)==2:
-        #         print('Mês')
-        #     elif len(data_completa)==3:
-        #         print('Dia')
-        #     else:
-        #         showinfo(title='Erro', message='Formato de data incorreto!')
-        #         data = ''
         
         if not data:
             print('Nenhuma data foi selecionada')
         else:
-            match_dia = padrao_dia.match(data)
-            match_mes = padrao_mes.match(data)
-            match_ano = padrao_ano.match(data)
-            if match_dia:
+            if padrao_dia.match(data):
                 print(f'DIA {data}')
-            elif match_mes:
+                if i==0: tempo='dia'
+                else:
+                    if tempo!='dia':
+                        showinfo(title='Erro', message='Apenas um formato de data é aceito por vez!')
+                        data = tempo = ''
+            elif padrao_mes.match(data):
                 print(f'MÊS {data}')
-            elif match_ano:
+                if i==0: tempo='mes'
+                else:
+                    if tempo!='mes':
+                        showinfo(title='Erro', message='Apenas um formato de data é aceito por vez!')
+                        data = tempo = ''
+            elif padrao_ano.match(data):
                 print(f'ANO {data}')
+                if i==0: tempo='ano'
+                else:
+                    if tempo!='ano':
+                        showinfo(title='Erro', message='Apenas um formato de data é aceito por vez!')
+                        data = tempo = ''
             else:
                 showinfo(title='Erro', message='Formato de data incorreto!')
-                data = ''
+                data, tempo = ''
 
             datas.append(data)
 
-    return datas
+    return datas, tempo
 
 def setListBox(listBox, list):
         listBox.delete(0, END)
@@ -450,7 +448,9 @@ class GraphicInterface(object):
             return
         
 
-        datas= tratamento_formato_data(self.lista_entries)
+        datas, tempo = tratamento_formato_data(self.lista_entries)
+
+        if tempo == '': return
 
         if not datas:
             showinfo(title='Erro', message='Nenhuma data foi selecionada')
@@ -469,7 +469,7 @@ class GraphicInterface(object):
         #     self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada)
         # except:
         #     showinfo(title='Erro', message='Erro ao gerar gráfico') #erro genérico provisório
-        self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada)
+        self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada, tempo)
 
 
 
@@ -610,38 +610,69 @@ class GraphicInterface(object):
 
 
 #Tornar possível fazer gráfico com várias variávei
-    def gerar_grafico_qualquer_variavel(self, tipo_grafico, datas_referencia, variavel_referencia):
+    def gerar_grafico_qualquer_variavel(self, tipo_grafico, datas_referencia, variavel_referencia, tempo):
 
         eixoY=[]
         eixoX=[]
 
         if tipo_grafico == 0: # Gráfico Diário
 
-            for data_referencia in datas_referencia:
+            if tempo == 'dia':
+                for data_referencia in datas_referencia:
 
-                nome_df = data_referencia.split('/')
-                if len(nome_df)>2: nome_df=nome_df[1]+'/'+nome_df[2]
+                    nome_df = data_referencia.split('/')
+                    if len(nome_df)>2: nome_df=nome_df[1]+'/'+nome_df[2]
 
-                if variavel_referencia == 'Horas de Sol Pleno (HSP)':
-                    y, x = valores_um_dia(self.dataFrames[nome_df], 'Radiacao (KWh/m²)', self.fuso, data_referencia)
-                else:
-                    y, x = valores_um_dia(self.dataFrames[nome_df], variavel_referencia, self.fuso, data_referencia)
-                eixoX.append(x)
-                eixoY.append(y)
+                    if variavel_referencia == 'Horas de Sol Pleno (HSP)':
+                        y, x = valores_um_dia(self.dataFrames[nome_df], 'Radiacao (KWh/m²)', self.fuso, data_referencia)
+                    else:
+                        y, x = valores_um_dia(self.dataFrames[nome_df], variavel_referencia, self.fuso, data_referencia)
+                    eixoX.append(x)
+                    eixoY.append(y)
+
+            elif tempo == 'mes':
+                for data_referencia in datas_referencia:
+                    if variavel_referencia == 'Horas de Sol Pleno (HSP)':
+                        y, x = mediaDia(self.dataFrames[data_referencia], 'Radiacao (KWh/m²)', self.fuso)
+                    else:
+                        y, x = mediaDia(self.dataFrames[data_referencia], variavel_referencia, self.fuso)
+                    eixoX.append(x)
+                    eixoY.append(y)
+
+            elif tempo == 'ano':
+                showinfo(title='Erro', message='Não implementado!')
+                return
 
         elif tipo_grafico == 1: # Gráfico Mensal
 
-            for data_referencia in datas_referencia:
-                if variavel_referencia == 'Horas de Sol Pleno (HSP)':
-                    y, x = mediaDia(self.dataFrames[data_referencia], 'Radiacao (KWh/m²)', self.fuso)
-                else:
-                    y, x = mediaDia(self.dataFrames[data_referencia], variavel_referencia, self.fuso)
-                eixoX.append(x)
-                eixoY.append(y)
+            if tempo == 'dia': showinfo(title='Erro', message='Não pode ser feito um gráfico mensal de apenas um dia!')
+
+            elif tempo == 'mes':
+                for data_referencia in datas_referencia:
+                    x=[]
+                    y=[]
+                    dias = listaDiasNovo(self.dataFrames[data_referencia], data_referencia, self.fuso)
+                    for dia in dias:
+                        media = mediaDiaNotNull(self.dataFrames[data_referencia], variavel_referencia, dia+'/'+data_referencia, self.fuso)
+                        x.append(dia)
+                        y.append(media)
+                    eixoX.append(x)
+                    eixoY.append(y)
+
+            elif tempo == 'ano':
+                showinfo(title='Erro', message='Não implementado!')
+                return
+
 
         elif tipo_grafico == 2: # Gráfico Anual
-            showinfo(title='Erro', message='Não implementado')
-            return
+
+            if tempo == 'dia': showinfo(title='Erro', message='Não pode ser feito um gráfico anual de apenas um dia!')
+
+            elif tempo == 'mes': showinfo(title='Erro', message='Não pode ser feito um gráfico anual de apenas um mês!')
+            
+            elif tempo == 'ano':
+                showinfo(title='Erro', message='Não implementado!')
+                return
 
         numero_curvas=len(eixoY)
         legendaX='Hora '+'(UTC'+self.fuso+')'

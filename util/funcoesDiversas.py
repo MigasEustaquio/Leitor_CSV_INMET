@@ -44,8 +44,6 @@ def mediaDiaNotNull(df, label, data, fuso):
         if valor != 0:
             valoresValidos.append(valor)
 
-    # media =  sum(valoresValidos)/len(valoresValidos)
-    
     if len(valoresValidos) == 0:
         return 0
     else:
@@ -60,6 +58,16 @@ def listaDias(df, fuso):
     
     return sorted(listaDias, key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y"))
 
+
+def listaDiasNovo(df, data, fuso):
+
+    formato_fuso='(UTC'+fuso+')'
+
+    valores=df[df['Date '+formato_fuso].str.endswith(data)]['Date '+formato_fuso].values
+
+    dias = [x.split('/')[0] for x in valores]
+    
+    return sorted(list(set(dias)))
 
 def valores_um_dia(df, label, fuso, dia):
 
