@@ -25,18 +25,18 @@ def main():
     # radiacaoMediaValida(df, dicionario_de_meses, MES_DE_REFERENCIA)
 
     # print(dicionario_de_meses[MES_DE_REFERENCIA])
-    mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses[MES_DE_REFERENCIA], 'Radiacao (Jh/m²)', FUSO_HORARIO)
-    geraGraficoBonito([horasDoDia], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora], ['Radiação (Jh/m²)'], ['Gráfico da radiação média o do Mês' + MES_DE_REFERENCIA])
+    mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses[MES_DE_REFERENCIA], 'Radiacao (KWh/m²)', FUSO_HORARIO)
+    geraGraficoBonito([horasDoDia], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora], ['Radiação (KWh/m²)'], ['Gráfico da radiação média o do Mês' + MES_DE_REFERENCIA])
 
 def radiacaoMediaValida(df, dicionario_de_meses, mes):
     dias = listaDias(dicionario_de_meses[mes], FUSO_HORARIO)
 
     for dia in dias:
-        media = mediaDiaNotNull(df, 'Radiacao (Jh/m²)', dia, FUSO_HORARIO)
+        media = mediaDiaNotNull(df, 'Radiacao (KWh/m²)', dia, FUSO_HORARIO)
         if media==0:
             print(dia, ' Dados insuficientes')
         else:
-            print (dia, f' Incidencia média: {media:.3f} Jh/m²')
+            print (dia, f' Incidencia média: {media:.3f} KWh/m²')
 
 
 if __name__ == "__main__":

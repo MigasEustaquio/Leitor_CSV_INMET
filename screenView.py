@@ -3,9 +3,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import ttk
 from tkinter.messagebox import showinfo
-from numpy import empty
-import pandas as pd
-import re
+
 
 from util.manipulaDataFame import *
 from util.dataView import *
@@ -473,6 +471,8 @@ class GraphicInterface(object):
         #     showinfo(title='Erro', message='Erro ao gerar gráfico') #erro genérico provisório
         self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada)
 
+
+
     # def addEntryToListBox(self, info, listBoxCheck, listBoxInsert):
     #     try:
     #         op = listBoxCheck.curselection()[0]
@@ -490,6 +490,7 @@ class GraphicInterface(object):
     
     def addEntryToTreeViewEntrys(self, tipo, data):
         try:
+           print('test')
            idxItem = self.listboxLabels.curselection()[0]
            variavel = self.listboxLabels.get(idxItem)
            self.treeViewEntrys.insert('','end', values=(tipo, data, variavel))
@@ -601,42 +602,49 @@ class GraphicInterface(object):
         
 # Gera uma janela com o gráfico do mês de referência
     def gerar_grafico(self, key_referencia, nome_referencia):
-        mediaPorHora, horasDoDia = mediaDia(self.dataFrames[key_referencia], 'Radiacao (Jh/m²)', self.fuso)
+        mediaPorHora, horasDoDia = mediaDia(self.dataFrames[key_referencia], 'Radiacao (KWh/m²)', self.fuso)
         print(self.dataFrames[key_referencia])
         print('NOME: ', nome_referencia)
-        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (Jh/m²)', 'Gráfico da radiação '+nome_referencia)
+        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (KWh/m²)', 'Gráfico da radiação '+nome_referencia)
         tSV.main()
 
 
 #Tornar possível fazer gráfico com várias variávei
     def gerar_grafico_qualquer_variavel(self, tipo_grafico, datas_referencia, variavel_referencia):
 
-        for data in datas_referencia:
-            print(data)
+        eixoY=[]
+        eixoX=[]
 
         if tipo_grafico == 0: # Gráfico Diário
-            showinfo(title='Erro', message='Não implementado')
-            return
+
+            for data_referencia in datas_referencia:
+
+                nome_df = data_referencia.split('/')
+                if len(nome_df)>2: nome_df=nome_df[1]+'/'+nome_df[2]
+
+                if variavel_referencia == 'Horas de Sol Pleno (HSP)':
+                    y, x = valores_um_dia(self.dataFrames[nome_df], 'Radiacao (KWh/m²)', self.fuso, data_referencia)
+                else:
+                    y, x = valores_um_dia(self.dataFrames[nome_df], variavel_referencia, self.fuso, data_referencia)
+                eixoX.append(x)
+                eixoY.append(y)
 
         elif tipo_grafico == 1: # Gráfico Mensal
 
-            eixoY=[]
-            eixoX=[]
-
             for data_referencia in datas_referencia:
                 if variavel_referencia == 'Horas de Sol Pleno (HSP)':
-                    y, x = mediaDia(self.dataFrames[data_referencia], 'Radiacao (Jh/m²)', self.fuso)
+                    y, x = mediaDia(self.dataFrames[data_referencia], 'Radiacao (KWh/m²)', self.fuso)
                 else:
                     y, x = mediaDia(self.dataFrames[data_referencia], variavel_referencia, self.fuso)
                 eixoX.append(x)
                 eixoY.append(y)
 
-            numero_curvas=len(eixoY)
-            legendaX='Hora '+'(UTC'+self.fuso+')'
-
         elif tipo_grafico == 2: # Gráfico Anual
             showinfo(title='Erro', message='Não implementado')
             return
+
+        numero_curvas=len(eixoY)
+        legendaX='Hora '+'(UTC'+self.fuso+')'
 
         if variavel_referencia == 'Horas de Sol Pleno (HSP)':
             geraGraficoHSP(eixoX, legendaX, eixoY[0], variavel_referencia)
@@ -648,7 +656,7 @@ class GraphicInterface(object):
 
 
 
-    # def gerar_rafico_fullDf(self, label):
+    # def gerar_grafico_fullDf(self, label):
     #     mediaPorHora, horasDoDia = mediaDia(self.dataFrames[key_referencia], label, self.fuso)
 
 

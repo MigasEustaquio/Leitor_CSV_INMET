@@ -1,7 +1,7 @@
 import pandas as pd
-import numpy as np
-import datetime
 import re
+
+from util.funcoesDiversas import *
 
 #Muda o tipo dos dados do df de string para numerico
 def string_para_numerico(df):
@@ -49,60 +49,13 @@ def definir_fuso_horario(df, fuso):
 
     return df
 
-
-def mediaDia(df, label, fuso):
-    mediaHoras=[]
-    horasDoDia=[]
-
-    formato_fuso='(UTC'+fuso+')'
-
-    for i in range(24):
-        if (i<10):
-            hora='-0'+str(i)
-        else:
-            hora='-'+str(i)
-        valoresDia = df[df['DateTime '+formato_fuso].str.endswith(hora)][label].values
-        if(len(valoresDia)>0):
-            mediaHoras.append(round(sum(valoresDia)/len(valoresDia),3))
-            horasDoDia.append(i)
-    
-    return mediaHoras,horasDoDia
-
 def addTempMedia(df):
     df['Temp. Med. (C)'] = (df['Temp. Min. (C)'].values + df['Temp. Max. (C)'].values)/2
     return df
 
 def KJ_to_KWh(df):
-    df['Radiacao (Jh/m²)']=df['Radiacao (KJ/m²)'].values/3.600
+    df['Radiacao (KWh/m²)']=df['Radiacao (KJ/m²)'].values/3.600
     return df
-
-#media no dia, descarta valores nulos
-def mediaDiaNotNull(df, label, data, fuso):
-    valoresValidos=[]
-
-    formato_fuso='(UTC'+fuso+')'
-
-    valores=df[df['Date '+formato_fuso].str.match(data)][label].values
-
-    for valor in valores:
-        if valor != 0:
-            valoresValidos.append(valor)
-
-    # media =  sum(valoresValidos)/len(valoresValidos)
-    
-    if len(valoresValidos) == 0:
-        return 0
-    else:
-        return sum(valoresValidos)/len(valoresValidos)
-
-def listaDias(df, fuso):
-
-    formato_fuso='(UTC'+fuso+')'
-
-    dias = df['Date '+formato_fuso].values
-    listaDias=list(set(dias))
-    
-    return sorted(listaDias, key=lambda date: datetime.datetime.strptime(date, "%d/%m/%Y"))
 
 def separar_dataframes_mes(df, fuso):
     mes_e_ano=''
