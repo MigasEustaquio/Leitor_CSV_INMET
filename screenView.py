@@ -1,3 +1,4 @@
+import re
 from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
@@ -638,7 +639,7 @@ class GraphicInterface(object):
 
     def gera_grafico_unico(self, values):
         tipo, data, variavel = values
-        print(tipo, data, variavel)
+        print(tipo, data, variavel)  
         df = pd.DataFrame
         if tipo == 'Diário':
             df = self.dataFrameDia[data]
@@ -650,9 +651,12 @@ class GraphicInterface(object):
             showinfo(title='Erro', message='Entrada Não identificada')
             return
         print(df)
-        mediaPorHora, horasDoDia = mediaDia(df, variavel, self.fuso)
+        if variavel == 'Horas de Sol Pleno (HSP)': 
+            mediaPorHora, horasDoDia = mediaDia(df, 'Radiacao (KWh/m²)', self.fuso)
+        else: 
+            mediaPorHora, horasDoDia = mediaDia(df, variavel, self.fuso)
         titulo=f'Gráfico {variavel}, média {tipo}: {data}'
-        geraGraficoBonito([horasDoDia], 'Hora '+'(UTC'+self.fuso+')', [mediaPorHora], [variavel], [titulo], numero_curvas=1)
+        geraGraficoBonito([horasDoDia], 'Hora '+'(UTC'+self.fuso+')', [mediaPorHora], [variavel], [titulo])
         GW.main()
 
     def gera_grafico_multiplos(self, listValues):
@@ -673,15 +677,19 @@ class GraphicInterface(object):
             else:
                 showinfo(title='Erro', message='Entrada(s) Não identificada(s)')
                 return
+            
+            if variavel == 'Horas de Sol Pleno (HSP)': 
+                mediaPorHora, horasDoDia = mediaDia(df, 'Radiacao (KWh/m²)', self.fuso)
+            else: 
+                mediaPorHora, horasDoDia = mediaDia(df, variavel, self.fuso)
+
             listVariaveis.append(variavel)
-            mediaPorHora, horasDoDia = mediaDia(df, variavel, self.fuso)
             listMediaPorHora.append(mediaPorHora)
             listHorasDoDia.append(horasDoDia)
             titulo= f'Gráfico {variavel}, média {tipo}: {data}'
             listTitulo.append(titulo)
 
-        listVariaveis = set(listVariaveis)
-        geraGraficoBonito(listHorasDoDia, 'Hora '+'(UTC'+self.fuso+')', listMediaPorHora, listVariaveis, listTitulo, numero_curvas=len(listTitulo))
+        geraGraficoBonito(listHorasDoDia, 'Hora '+'(UTC'+self.fuso+')', listMediaPorHora, listVariaveis, listTitulo)
         GW.main()
 
 

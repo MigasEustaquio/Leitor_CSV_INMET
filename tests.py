@@ -106,14 +106,19 @@ def test():
     variavel2='Radiação (Jh/m²)'
     t2=f'Gráfico {variavel2} do dia: {dia2}'
 
+    mediaPorHora4, horasDoDia4 = mediaDia(df_em_dias[dia2], 'Radiacao (KWh/m²)', FUSO_HORARIO)
+    variavel4='Horas de Sol Pleno (HSP)'
+    t4=f'Gráfico {variavel4} do dia: {dia2}'
+
     ano3='2022'
     mediaPorHora3, horasDoDia3 = mediaDia(df_em_anos[ano3], 'Radiacao (KWh/m²)', FUSO_HORARIO)
     variavel3='Radiação (Jh/m²)'
     t3=f'Gráfico {variavel3} do ano: {ano3}'
 
-    variaveis=[variavel1, variavel2, variavel3]
-    variaveis = set(variaveis)
-    geraGraficoBonito([horasDoDia1, horasDoDia2, horasDoDia2], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora1, mediaPorHora2, mediaPorHora3], variaveis, [t1, t2, t3], numero_curvas=3)
+    variaveis=[variavel1, variavel2, variavel3, variavel4]
+    #geraGraficoBonito([horasDoDia1, horasDoDia2, horasDoDia3], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora1, mediaPorHora2, mediaPorHora3], [variavel1, variavel2, variavel3], [t1, t2, t3])
+    geraGraficoBonito([horasDoDia1, horasDoDia2, horasDoDia3, horasDoDia4], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora1, mediaPorHora2, mediaPorHora3, mediaPorHora4], variaveis, [t1, t2, t3, t4])
+    #geraGraficoBonito([horasDoDia4], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora4], [variavel4], [t4])
 
 def TestesDataViewAnos(df):
     df_em_anos = separar_dataframes_ano(df, FUSO_HORARIO)

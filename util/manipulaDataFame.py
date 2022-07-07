@@ -1,7 +1,6 @@
+import datetime
+import numpy as np
 import pandas as pd
-import re
-
-from util.funcoesDiversas import *
 
 #Muda o tipo dos dados do df de string para numerico
 def string_para_numerico(df):
