@@ -124,7 +124,7 @@ def test():
     #geraGraficoBonito([horasDoDia4], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora4], [variavel4], [t4])
     
     
-    # geraGraficoBonito([horasDoDia4, horasDoDia5], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora4, mediaPorHora5], [variavel4, variavel4], [t4, t5])
+    #geraGraficoBonito([horasDoDia4, horasDoDia5], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora4, mediaPorHora5], [variavel4, variavel4], [t4, t5])
 
 def TestesDataViewAnos(df):
     df_em_anos = separar_dataframes_ano(df, FUSO_HORARIO)

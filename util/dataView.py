@@ -18,15 +18,27 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
     variaveis=legendaY.copy()
     figureData = make_subplots(specs=[[{"secondary_y": True}]])
     
+    titulos=''
+    for i in titulo:
+        titulos += i+'<br>'
+    strLegendaY=''
+    secondary_y_title=False
+    for i in set(variaveis):
+        if i == 'Horas de Sol Pleno (HSP)':
+            secondary_y_title=True
+            pass
+        else:
+            strLegendaY += i+'<br>'
+
     for curva in range(len(legendaY)):
         if(legendaY[curva]=='Horas de Sol Pleno (HSP)'):
             _, hsp, _ =calculaHSP(eixoY[curva])
             max_valuesX, _, _, _ = get_max_min(eixoX[curva], eixoY[curva])
             hoverinformation = str(round(hsp, 3)) + ' HSP'
-            centro=max_valuesX[0]
+            centro=12
             
             trace1=go.Scatter(x = [0, eixoX[curva][-1]], y = [0, 0], mode = 'markers', showlegend = False, marker_color = 'rgba(255, 255, 0, 0)')
-            ftrace2=go.Bar(
+            trace2=go.Bar(
                 yaxis='y2',
                 y = [1000],
                 x = [centro],
@@ -38,7 +50,7 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
             )
 
             figureData.add_trace(trace1, secondary_y=True)
-            figureData.add_trace(ftrace2, secondary_y=True)
+            figureData.add_trace(trace2, secondary_y=True)
             
         else:
             max_valuesX, max_valuesY, min_valuesX, min_valuesY = get_max_min(eixoX[curva], eixoY[curva])
@@ -50,14 +62,10 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
             figureData.add_trace(maxValuesData)
             figureData.add_trace(mainData)
 
-    titulos=''
-    for i in titulo:
-        titulos += i+'<br>'
-    strLegendaY=''
-    for i in set(variaveis):
-        strLegendaY += i+'<br>'
     fig = go.Figure(data=figureData)
-    fig.update_layout(barmode='stack', plot_bgcolor="#FFF", title=titulos, yaxis={'title':strLegendaY, 'showgrid':False},xaxis={'title': legendaX, 'showgrid':False})
+    fig.update_layout(barmode='group', plot_bgcolor="#FFF", title=titulos, yaxis={'title':strLegendaY, 'showgrid':False},xaxis={'title': legendaX, 'showgrid':False})
+    if secondary_y_title == True:
+        fig.update_yaxes(title_text='Horas de Sol Pleno (HSP)', secondary_y=True)
     py.plot(fig, auto_open = False)
 
 
