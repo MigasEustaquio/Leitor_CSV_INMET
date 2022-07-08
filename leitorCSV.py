@@ -12,7 +12,7 @@ def main():
     df = string_para_numerico(df)
     df = definir_fuso_horario(df, FUSO_HORARIO)
     df = addTempMedia(df)
-    df = KJ_to_KWh(df)
+    df = KJ_to_Wh(df)
 
     # print('COMPLETO ',df)
 
@@ -25,18 +25,18 @@ def main():
     # radiacaoMediaValida(df, dicionario_de_meses, MES_DE_REFERENCIA)
 
     # print(dicionario_de_meses[MES_DE_REFERENCIA])
-    mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses[MES_DE_REFERENCIA], 'Radiacao (KWh/m²)', FUSO_HORARIO)
-    geraGraficoBonito([horasDoDia], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora], ['Radiação (KWh/m²)'], ['Gráfico da radiação média o do Mês' + MES_DE_REFERENCIA])
+    mediaPorHora, horasDoDia = mediaDia(dicionario_de_meses[MES_DE_REFERENCIA], 'Radiacao (Wh/m²)', FUSO_HORARIO)
+    geraGraficoBonito([horasDoDia], 'Hora '+'(UTC'+FUSO_HORARIO+')' , [mediaPorHora], ['Radiação (Wh/m²)'], ['Gráfico da radiação média o do Mês' + MES_DE_REFERENCIA])
 
 def radiacaoMediaValida(df, dicionario_de_meses, mes):
     dias = listaDias(dicionario_de_meses[mes], FUSO_HORARIO)
 
     for dia in dias:
-        media = mediaDiaNotNull(df, 'Radiacao (KWh/m²)', dia, FUSO_HORARIO)
+        media = mediaDiaNotNull(df, 'Radiacao (Wh/m²)', dia, FUSO_HORARIO)
         if media==0:
             print(dia, ' Dados insuficientes')
         else:
-            print (dia, f' Incidencia média: {media:.3f} KWh/m²')
+            print (dia, f' Incidencia média: {media:.3f} Wh/m²')
 
 
 if __name__ == "__main__":

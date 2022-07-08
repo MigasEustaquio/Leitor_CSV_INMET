@@ -52,8 +52,8 @@ def addTempMedia(df):
     df['Temp. Med. (C)'] = (df['Temp. Min. (C)'].values + df['Temp. Max. (C)'].values)/2
     return df
 
-def KJ_to_KWh(df):
-    df['Radiacao (KWh/m²)']=df['Radiacao (KJ/m²)'].values/3.600
+def KJ_to_Wh(df):
+    df['Radiacao (Wh/m²)']=df['Radiacao (KJ/m²)'].values/3.600
     return df
 
 def separar_dataframes_mes(df, fuso):

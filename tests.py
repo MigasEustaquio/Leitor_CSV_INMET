@@ -48,11 +48,10 @@
 #     plt.plot(hrsDoDia, novoMediaMes)
 #     plt.show()
 
-import pandas as pd
 import plotly.graph_objs as go
 import plotly.offline as py
-import numpy as np
 from util.dataView import *
+# from util.funcoesDiversas import *
 
 def graficoBonito():
     # Gráfico usando apenas marcadores
@@ -86,7 +85,7 @@ def test():
     df = string_para_numerico(df)
     df = definir_fuso_horario(df, FUSO_HORARIO)
     df = addTempMedia(df)
-    df = KJ_to_KWh(df)
+    df = KJ_to_Wh(df)
 
     #TestesDataViewMeses(df)
     #TestesDataViewDias(df)
@@ -97,25 +96,25 @@ def test():
     df_em_anos = separar_dataframes_ano(df, FUSO_HORARIO)
 
     mes1='01/2022'
-    mediaPorHora1, horasDoDia1 = mediaDia(df_em_meses[mes1], 'Radiacao (KWh/m²)', FUSO_HORARIO)
+    mediaPorHora1, horasDoDia1 = mediaDia(df_em_meses[mes1], 'Radiacao (Wh/m²)', FUSO_HORARIO)
     variavel1='Radiação (Jh/m²)'
     t1=f'Gráfico {variavel1} do Mês: {mes1}'
 
     dia2='01/01/2022'
-    mediaPorHora2, horasDoDia2 = mediaDia(df_em_dias[dia2], 'Radiacao (KWh/m²)', FUSO_HORARIO)
+    mediaPorHora2, horasDoDia2 = mediaDia(df_em_dias[dia2], 'Radiacao (Wh/m²)', FUSO_HORARIO)
     variavel2='Radiação (Jh/m²)'
     t2=f'Gráfico {variavel2} do dia: {dia2}'
 
-    mediaPorHora4, horasDoDia4 = mediaDia(df_em_dias[dia2], 'Radiacao (KWh/m²)', FUSO_HORARIO)
+    mediaPorHora4, horasDoDia4 = mediaDia(df_em_dias[dia2], 'Radiacao (Wh/m²)', FUSO_HORARIO)
     variavel4='Horas de Sol Pleno (HSP)'
     t4=f'Gráfico {variavel4} do dia: {dia2}'
 
     ano3='2022'
-    mediaPorHora3, horasDoDia3 = mediaDia(df_em_anos[ano3], 'Radiacao (KWh/m²)', FUSO_HORARIO)
+    mediaPorHora3, horasDoDia3 = mediaDia(df_em_anos[ano3], 'Radiacao (Wh/m²)', FUSO_HORARIO)
     variavel3='Radiação (Jh/m²)'
     t3=f'Gráfico {variavel3} do ano: {ano3}'
 
-    mediaPorHora5, horasDoDia5 = mediaDia(df_em_dias['20/01/2022'], 'Radiacao (KWh/m²)', FUSO_HORARIO)
+    mediaPorHora5, horasDoDia5 = mediaDia(df_em_dias['20/01/2022'], 'Radiacao (Wh/m²)', FUSO_HORARIO)
     variavel5='Horas de Sol Pleno (HSP)'
     t5=f'Gráfico {variavel5} do dia: 20/01/2022'
 

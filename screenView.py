@@ -40,25 +40,25 @@ def tratamento_formato_data(lista_entries):
         if not data:
             print('Nenhuma data foi selecionada')
         else:
-            if padrao_dia.match(data):
+            if padrao_dia.fullmatch(data):
                 print(f'DIA {data}')
-                if i==0: tempo='dia'
+                if i==0: tempo='Diário'
                 else:
-                    if tempo!='dia':
+                    if tempo!='Diário':
                         showinfo(title='Erro', message='Apenas um formato de data é aceito por vez!')
                         data = tempo = ''
-            elif padrao_mes.match(data):
+            elif padrao_mes.fullmatch(data):
                 print(f'MÊS {data}')
-                if i==0: tempo='mes'
+                if i==0: tempo='Mensal'
                 else:
-                    if tempo!='mes':
+                    if tempo!='Mensal':
                         showinfo(title='Erro', message='Apenas um formato de data é aceito por vez!')
                         data = tempo = ''
-            elif padrao_ano.match(data):
+            elif padrao_ano.fullmatch(data):
                 print(f'ANO {data}')
-                if i==0: tempo='ano'
+                if i==0: tempo='Anual'
                 else:
-                    if tempo!='ano':
+                    if tempo!='Anual':
                         showinfo(title='Erro', message='Apenas um formato de data é aceito por vez!')
                         data = tempo = ''
             else:
@@ -123,7 +123,7 @@ class GraphicInterface(object):
         self.dataFrameSeparadoMes=False
         self.dataFrameSeparadoAno=False
         self.numeroEntriesData=0
-        self.lista_entries=[]
+        
 
         self.mainScreen = Tk()
 
@@ -163,7 +163,6 @@ class GraphicInterface(object):
         setFusoButton.grid(row=0, column=100)
         self.entryFuso = Entry(self.mainScreen)
         self.entryFuso.grid(row=setFusoButton.grid_info()["row"], column=setFusoButton.grid_info()["column"]+1)
-        
 
         
         selectFileButton = Button(self.mainScreen, text='Selecionar Arquivos', command = self.selectFile)
@@ -224,8 +223,6 @@ class GraphicInterface(object):
         testeScreen.protocol("WM_DELETE_WINDOW", lambda: destroyAndRecover(testeScreen, closedScreen))
         btnBackToMain = Button(testeScreen, text='Voltar para menu inicial', command = lambda: destroyAndRecover(testeScreen, closedScreen))
         btnBackToMain.grid(column=101, row=0, padx=15, pady=15)
-        btnConfirm = Button(testeScreen, text='Confirmar', command=self.itens_selecionados)
-        btnConfirm.grid(column=100, row=100, padx=15, pady=15)
 
         self.labelTipoGrafico = Label(testeScreen, text =  'Tipo de Gráfico')
         self.labelTipoGrafico.grid(column=0, row=0)
@@ -291,18 +288,7 @@ class GraphicInterface(object):
         self.scrollbarTreeViewEntrys = Scrollbar(testeScreen, orient='vertical', command = self.treeViewEntrys.yview)
         self.treeViewEntrys['yscrollcommand'] = self.treeViewEntrys.set
         self.scrollbarTreeViewEntrys.grid(column=self.treeViewEntrysInfo['column']+1, row=self.treeViewEntrysInfo['row'], sticky='ns')
-        self.scrollbarTreeViewEntrysInfo = self.scrollbarTreeViewEntrys.grid_info()
-
-
-        # self.listBoxEntrys = Listbox(testeScreen, height=6, exportselection=0, width = 60)
-        # self.listBoxEntrys.grid(column=self.labelEntrysInfo['column'], row=self.labelEntrysInfo['row']+1, sticky='nwes')
-        # self.listBoxlabelEntrysInfo = self.listBoxEntrys.grid_info()
-
-        # self.scrollbarEntrys = Scrollbar(testeScreen, orient='vertical', command=self.listBoxEntrys.yview)
-        # self.listBoxEntrys['yscrollcommand'] = self.scrollbarEntrys.set
-        # self.scrollbarEntrys.grid(column=self.listBoxlabelEntrysInfo['column']+1, row=self.listBoxlabelEntrysInfo['row'], sticky='ns')
-        # self.scrollbarEntrysInfo = self.scrollbarEntrys.grid_info()
-        
+        self.scrollbarTreeViewEntrysInfo = self.scrollbarTreeViewEntrys.grid_info()        
 
         self.btnsEntrysContainer = Frame(testeScreen)
         self.btnsEntrysContainer.grid(row = self.scrollbarTreeViewEntrysInfo['row'], column = self.scrollbarTreeViewEntrysInfo['column']+1)
@@ -331,18 +317,27 @@ class GraphicInterface(object):
     
         self.btnVoltar = Button(testeScreen, text = 'Voltar', command = lambda: print('voltar'))
 
-        self.buttonAddEntry = Button(testeScreen, text='Adicionar Linha', command=lambda: self.cria_entry_data(testeScreen))
-        self.buttonAddEntry.grid(row=self.treeViewEntrysInfo['row']+1, column=self.treeViewEntrysInfo['column'])
-        self.buttonAddEntryInfo = self.buttonAddEntry.grid_info()
-
         self.btnAdicionarListaEntradas = Button(testeScreen, text = 'Adicionar Entrada')
         self.btnAdicionarListaEntradas.grid(row = self.listboxLabelsInfo['row']+1, column = self.listboxLabelsInfo['column'])
         self.btnAdicionarListaEntradasInfo = self.btnAdicionarListaEntradas.grid_info()
         self.btnAdicionarListaEntradas.grid_forget()
 
-        self.cria_entry_data(testeScreen)
+        entryDate = Entry(testeScreen)
+        entryDate.grid(column=self.treeViewEntrysInfo['column'], row=self.treeViewEntrysInfo['row']+1)
+        entryDateInfo = entryDate.grid_info()
+
+    
+        btnConfirm = Button(testeScreen, text='Confirmar', command=lambda: self.addEntryToTreeViewEntrysBtn(entryDate))
+        btnConfirm.grid(column=entryDateInfo['column'], row=entryDateInfo['row']+1, padx=15, pady=15)
 
         testeScreen.mainloop
+    
+    def addEntryToTreeViewEntrysBtn(self, entryDate):
+        if not self.dataFrameSeparadoDia: self.splitDataFrameDia()
+        if not self.dataFrameSeparadoMes: self.splitDataFrameMes()
+        if not self.dataFrameSeparadoAno: self.splitDataFrameAno()
+        datas, tipo = tratamento_formato_data([entryDate])
+        self.addEntryToTreeViewEntrys(tipo, datas[0], BtnVoltar=True)
 
     def op_intervalo_data(self, listBox):
         self.opState = 'Inicio'
@@ -426,7 +421,6 @@ class GraphicInterface(object):
                 self.carregarDia()
             else:
                 self.showElement(self.btnAdicionarListaEntradas, self.btnAdicionarListaEntradasInfo)
-                #self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToListBox([self.tipoGrafico, self.opMes], self.listboxLabels, self.listBoxEntrys))
                 self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToTreeViewEntrys(self.tipoGrafico, self.opMes))
                 
         except IndexError:
@@ -449,12 +443,10 @@ class GraphicInterface(object):
 
             self.btnVoltar.configure(command = lambda: self.carregaMes())
             self.showElement(self.btnAdicionarListaEntradas, self.btnAdicionarListaEntradasInfo)
-            #self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToListBox([self.tipoGrafico, self.opDia], self.listboxLabels, self.listBoxEntrys))
             self.btnAdicionarListaEntradas.configure(command = lambda: self.addEntryToTreeViewEntrys(self.tipoGrafico, self.opDia))
         except IndexError:
             showinfo(title='Erro', message='Selecione o dia')
-            return
-        
+            return 
     
     def itens_selecionados(self):
         try:
@@ -493,29 +485,13 @@ class GraphicInterface(object):
         #     showinfo(title='Erro', message='Erro ao gerar gráfico') #erro genérico provisório
         self.gerar_grafico_qualquer_variavel(tipo_selecionado, datas, variavel_selecionada, tempo)
 
-
-
-    # def addEntryToListBox(self, info, listBoxCheck, listBoxInsert):
-    #     try:
-    #         op = listBoxCheck.curselection()[0]
-    #         entry = [info, listBoxCheck.get(op)]
-    #         entryText = 'Informaçoes; Data: '
-    #         for i in info:
-    #             entryText += i+' '
-    #         entryText +='; Variavel: '+listBoxCheck.get(op)
-    #         listBoxInsert.insert('end', entryText)
-    #         print(entryText)
-    #         self.voltarDefault()
-    #     except IndexError:
-    #         showinfo(title='Erro', message='Selecione o parâmetro indicado')
-    #         return
     
-    def addEntryToTreeViewEntrys(self, tipo, data):
+    def addEntryToTreeViewEntrys(self, tipo, data, BtnVoltar=False):
         try:
-           idxItem = self.listboxLabels.curselection()[0]
-           variavel = self.listboxLabels.get(idxItem)
-           self.treeViewEntrys.insert('','end', values=(tipo, data, variavel))
-           self.voltarDefault()
+            idxItem = self.listboxLabels.curselection()[0]
+            variavel = self.listboxLabels.get(idxItem)
+            self.treeViewEntrys.insert('','end', values=(tipo, data, variavel))
+            if not BtnVoltar: self.voltarDefault()
         except IndexError:
             showinfo(title='Erro', message='Selecione uma Variável')
             return
@@ -543,6 +519,9 @@ class GraphicInterface(object):
 # Recupera o fuso horário digitado e, se preciso, recarrega o dstaframe
     def define_fuso_horario(self):
         fuso=list(self.entryFuso.get())
+        self.dataFrameSeparadoDia=False
+        self.dataFrameSeparadoMes=False
+        self.dataFrameSeparadoAno=False
         if len(fuso)>2: fuso[1]+=fuso[2]
         try:
             if fuso[0] == '+' or fuso[0] == '-':
@@ -551,9 +530,7 @@ class GraphicInterface(object):
 # Recarrega o dataframe caso o mesmo já tiver sido criado
                     if not self.dataFrame.empty:
                         self.selectFile(recarregar_dataframe=True)
-                        if self.dataFrameSeparadoMes:
-                            self.splitDataFrameMes()
-#
+
                     showinfo("Sucesso", "Fuso Horário alterado com sucesso! (UTC"+self.entryFuso.get()+")")
                 else: showinfo("Erro", "Insira apenas números vállidos (1-12) após o sinal.")
             else: showinfo("Erro", "Insira um sinal positivo(+) ou negativo(-) seguido de um número.")
@@ -585,7 +562,7 @@ class GraphicInterface(object):
         self.dataFrame = string_para_numerico(self.dataFrame)
         self.dataFrame = definir_fuso_horario(self.dataFrame, self.fuso)
         self.dataFrame = addTempMedia(self.dataFrame)
-        self.dataFrame = KJ_to_KWh(self.dataFrame)
+        self.dataFrame = KJ_to_Wh(self.dataFrame)
 
     def formatText(self, fileNames):
         finalText=''
@@ -631,10 +608,10 @@ class GraphicInterface(object):
         
 # Gera uma janela com o gráfico do mês de referência
     def gerar_grafico(self, key_referencia, nome_referencia):
-        mediaPorHora, horasDoDia = mediaDia(self.dataFrameMes[key_referencia], 'Radiacao (KWh/m²)', self.fuso)
+        mediaPorHora, horasDoDia = mediaDia(self.dataFrameMes[key_referencia], 'Radiacao (Wh/m²)', self.fuso)
         print(self.dataFrameMes[key_referencia])
         print('NOME: ', nome_referencia)
-        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (KWh/m²)', 'Gráfico da radiação '+nome_referencia)
+        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (Wh/m²)', 'Gráfico da radiação '+nome_referencia)
         GW.main()
 
     def gera_grafico_unico(self, values):
@@ -652,7 +629,7 @@ class GraphicInterface(object):
             return
         print(df)
         if variavel == 'Horas de Sol Pleno (HSP)': 
-            mediaPorHora, horasDoDia = mediaDia(df, 'Radiacao (KWh/m²)', self.fuso)
+            mediaPorHora, horasDoDia = mediaDia(df, 'Radiacao (Wh/m²)', self.fuso)
         else: 
             mediaPorHora, horasDoDia = mediaDia(df, variavel, self.fuso)
         titulo=f'Gráfico {variavel}, média {tipo}: {data}'
@@ -679,7 +656,7 @@ class GraphicInterface(object):
                 return
             
             if variavel == 'Horas de Sol Pleno (HSP)': 
-                mediaPorHora, horasDoDia = mediaDia(df, 'Radiacao (KWh/m²)', self.fuso)
+                mediaPorHora, horasDoDia = mediaDia(df, 'Radiacao (Wh/m²)', self.fuso)
             else: 
                 mediaPorHora, horasDoDia = mediaDia(df, variavel, self.fuso)
 
@@ -708,7 +685,7 @@ class GraphicInterface(object):
                     if len(nome_df)>2: nome_df=nome_df[1]+'/'+nome_df[2]
 
                     if variavel_referencia == 'Horas de Sol Pleno (HSP)':
-                        y, x = valores_um_dia(self.dataFrameMes[nome_df], 'Radiacao (KWh/m²)', self.fuso, data_referencia)
+                        y, x = valores_um_dia(self.dataFrameMes[nome_df], 'Radiacao (Wh/m²)', self.fuso, data_referencia)
                     else:
                         y, x = valores_um_dia(self.dataFrameMes[nome_df], variavel_referencia, self.fuso, data_referencia)
                     eixoX.append(x)
@@ -717,7 +694,7 @@ class GraphicInterface(object):
             elif tempo == 'mes':
                 for data_referencia in datas_referencia:
                     if variavel_referencia == 'Horas de Sol Pleno (HSP)':
-                        y, x = mediaDia(self.dataFrameMes[data_referencia], 'Radiacao (KWh/m²)', self.fuso)
+                        y, x = mediaDia(self.dataFrameMes[data_referencia], 'Radiacao (Wh/m²)', self.fuso)
                     else:
                         y, x = mediaDia(self.dataFrameMes[data_referencia], variavel_referencia, self.fuso)
                     eixoX.append(x)
