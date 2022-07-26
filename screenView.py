@@ -11,6 +11,13 @@ from util.dataView import *
 import util.graphicWindow as GW
 
 
+FUSO_BR =  {
+            '-5': 'Rio Branco (BRT-2) ', 
+            '-4': 'Manaus (BRT-1) ',
+            '-3': 'Brasília (BRT) ',
+            '-2': 'Fernando de Noronha (BRT+1) '
+            }
+
 def getFiles(fullpaths):
     dfs=[]
     for fullpath in fullpaths:
@@ -611,7 +618,13 @@ class GraphicInterface(object):
         mediaPorHora, horasDoDia = mediaDia(self.dataFrameMes[key_referencia], 'Radiacao (Wh/m²)', self.fuso)
         print(self.dataFrameMes[key_referencia])
         print('NOME: ', nome_referencia)
-        geraGraficoBonito(horasDoDia, 'Hora '+'(UTC'+self.fuso+')' , mediaPorHora, 'Radiação (Wh/m²)', 'Gráfico da radiação '+nome_referencia)
+        legendaX='Hora '
+        try:
+            legendaX=legendaX+FUSO_BR[self.fuso]
+        except:
+            legendaX=legendaX+'(UTC'+self.fuso+')'
+        
+        geraGraficoBonito(horasDoDia, legendaX , mediaPorHora, 'Radiação (Wh/m²)', 'Gráfico da radiação '+nome_referencia)
         GW.main()
 
     def gera_grafico_unico(self, values):
@@ -633,7 +646,14 @@ class GraphicInterface(object):
         else: 
             mediaPorHora, horasDoDia = mediaDia(df, variavel, self.fuso)
         titulo=f'Gráfico {variavel}, média {tipo}: {data}'
-        geraGraficoBonito([horasDoDia], 'Hora '+'(UTC'+self.fuso+')', [mediaPorHora], [variavel], [titulo])
+        
+        legendaX='Hora '
+        try:
+            legendaX=legendaX+FUSO_BR[self.fuso]
+        except:
+            legendaX=legendaX+'(UTC'+self.fuso+')'
+
+        geraGraficoBonito([horasDoDia], legendaX, [mediaPorHora], [variavel], [titulo])
         GW.main()
 
     def gera_grafico_multiplos(self, listValues):
@@ -666,7 +686,12 @@ class GraphicInterface(object):
             titulo= f'Gráfico {variavel}, média {tipo}: {data}'
             listTitulo.append(titulo)
 
-        geraGraficoBonito(listHorasDoDia, 'Hora '+'(UTC'+self.fuso+')', listMediaPorHora, listVariaveis, listTitulo)
+        legendaX='Hora '
+        try:
+            legendaX=legendaX+FUSO_BR[self.fuso]
+        except:
+            legendaX=legendaX+'(UTC'+self.fuso+')'
+        geraGraficoBonito(listHorasDoDia, legendaX, listMediaPorHora, listVariaveis, listTitulo)
         GW.main()
 
 

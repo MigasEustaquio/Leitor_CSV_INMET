@@ -55,7 +55,7 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
         else:
             max_valuesX, max_valuesY, min_valuesX, min_valuesY = get_max_min(eixoX[curva], eixoY[curva])
             mainData = go.Scatter(x = eixoX[curva], y = eixoY[curva], mode = 'markers+lines', name = titulo[curva])
-            maxValuesData = go.Scatter(x = max_valuesX, y = max_valuesY, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(size=10),name = 'Valor Máximo '+titulo[curva])
+            maxValuesData = go.Scatter(x = max_valuesX, y = max_valuesY, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(size=10), name = 'Valor Máximo '+titulo[curva])
             minValuesData = go.Scatter(x = min_valuesX, y = min_valuesY, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(size=10), name = 'Valor Mínimo '+titulo[curva])
             
             figureData.add_trace(minValuesData)
@@ -63,10 +63,20 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
             figureData.add_trace(mainData)
 
     fig = go.Figure(data=figureData)
-    fig.update_layout(barmode='group', plot_bgcolor="#FFF", title=titulos, yaxis={'title':strLegendaY, 'showgrid':False},xaxis={'title': legendaX, 'showgrid':False})
+    fig.update_layout(barmode='group', plot_bgcolor="#FFF", title=titulos)
+    fig.update_yaxes(title=strLegendaY,showline=True, linewidth=1, linecolor='black', ticks='inside')
+    fig.update_xaxes(title= legendaX, showline=True, linewidth=1, linecolor='black', ticks='inside')
+    #tickmode='auto', nticks=6
+    # fig.update_layout(
+    #     xaxis_tickformatstops = [
+    #         dict(dtickrange=[None, None], value= "%H Hrs")
+    #     ]
+    # )
+    #tickmode = 'linear', tick0 = 0, dtick = 4
+    #ticklabelstep=1
     if secondary_y_title == True:
         fig.update_yaxes(title_text='Horas de Sol Pleno (HSP)', secondary_y=True)
-    py.plot(fig, auto_open = False)
+    py.plot(fig, auto_open = True)
 
 
 def geraGraficoHSP(eixoX, legendaX, eixoY, legendaY):
