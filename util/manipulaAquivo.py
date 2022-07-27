@@ -8,3 +8,11 @@ def ler_arquivos(path, nomesDosArquivos):
         df = df.replace(',', '.', regex=True)
         dfs.append(df)
     return dfs
+
+def getFiles(fullpaths):
+    dfs=[]
+    for fullpath in fullpaths:
+        df = pd.read_csv(fullpath, sep=";").fillna(0)
+        df = df.replace(',', '.', regex=True)
+        dfs.append(df)
+    return dfs
