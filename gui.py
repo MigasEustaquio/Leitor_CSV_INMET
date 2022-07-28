@@ -24,6 +24,7 @@ def showElement(element, info):
 def destroyAndRecover(screen1, screen2):
         screen1.destroy()
         screen2.deiconify()
+
 def tratamento_formato_data(lista_entries):
     padrao_dia = re.compile("[0-9]{2}[/][0-9]{2}[/][0-9]{4}")
     padrao_mes = re.compile("[0-9]{2}[/][0-9]{4}")
@@ -103,8 +104,6 @@ def getAllTreeViewEntrys(tree):
         for idxItem in tree.get_children():
             listValues.append(tree.item(idxItem, 'values'))
     return listValues
-   
-
 
 class GraphicUserInterface(object): 
     def __init__(self,  root):
@@ -118,6 +117,8 @@ class GraphicUserInterface(object):
         self.dataFrameSeparadoMes=False
         self.dataFrameSeparadoAno=False
         self.numeroEntriesData=0
+        
+        self.externalOutput = False
 
 
         root.title('Leitor CSV INMET')
@@ -166,7 +167,7 @@ class GraphicUserInterface(object):
         self.toViewButtonInfo = self.toViewButton.grid_info()
         self.toViewButton.grid_forget()
 
-        configButton = Button(botContainer, text='Opções')
+        configButton = Button(botContainer, text='Opções', command = lambda:self.configScreen(root))
         configButton.grid(column=self.toViewButtonInfo["column"]+1, row=self.toViewButtonInfo["row"], padx=(400,5))
         configButtonInfo = configButton.grid_info()
 
@@ -178,10 +179,11 @@ class GraphicUserInterface(object):
 
     def toOptionsViewScreen(self, closedScreen, df):
         closedScreen.withdraw()
-
         optionsViewScreen = Tk()
         optionsViewScreen.title('Opções De Visualização')
         optionsViewScreen.protocol("WM_DELETE_WINDOW", lambda: destroyAndRecover(optionsViewScreen, closedScreen))
+        
+        print('Saída externa',self.externalOutput)
         btnBackToMain = Button(optionsViewScreen, text='Voltar para menu inicial', command = lambda: destroyAndRecover(optionsViewScreen, closedScreen))
         btnBackToMain.grid(column=100, row=0, padx=(0,15))
 
@@ -354,7 +356,6 @@ class GraphicUserInterface(object):
         showElement(self.btnAvancar, self.btnVoltarInfo)
         self.btnAvancar.configure(command = lambda: self.op_intervalo_data(self.listboxTipoGrafico))
 
-
     def carregaAno(self):
         self.labelIntervalOP['text'] = 'Selecione o Ano'
         self.listBoxIntervalOp.delete(0, END)
@@ -445,8 +446,9 @@ class GraphicUserInterface(object):
         except:
             legendaX=legendaX+'(UTC'+self.fuso+')'
 
-        geraGraficoBonito([horasDoDia], legendaX, [mediaPorHora], [variavel], [titulo])
-        GW.main()
+        geraGraficoBonito([horasDoDia], legendaX, [mediaPorHora], [variavel], [titulo], self.externalOutput)
+        if (not self.externalOutput):
+            GW.main()
 
     def gera_grafico_multiplos(self, listValues):
         print(listValues)
@@ -483,8 +485,9 @@ class GraphicUserInterface(object):
             legendaX=legendaX+FUSO_BR[self.fuso]
         except:
             legendaX=legendaX+'(UTC'+self.fuso+')'
-        geraGraficoBonito(listHorasDoDia, legendaX, listMediaPorHora, listVariaveis, listTitulo)
-        GW.main()
+        geraGraficoBonito(listHorasDoDia, legendaX, listMediaPorHora, listVariaveis, listTitulo, self.externalOutput)
+        if (not self.externalOutput):
+            GW.main()
 
 
 # Lê os arquivos selecionados e prepara o Dataframe
@@ -559,6 +562,68 @@ class GraphicUserInterface(object):
         self.dataFrameAno = separar_dataframes_ano(self.dataFrame, self.fuso)
         self.dataFrameSeparadoAno=True
 
+    def boxbChanged(self, x):
+        print(x.get())
+        
+    def configScreen(self, root):
+        opScreen = Toplevel(root)
+        
+        listScreenToCloseOnComfirm=[opScreen]
+        
+        opScreen.title('Opções de Configuração')
+        
+        outputCheck = BooleanVar()
+
+        outCheckBtn = Checkbutton(opScreen,
+                        text='Saída No Seu Browser Padrão',
+                        # command=lambda:self.boxbChanged(outputCheck),
+                        variable=outputCheck,
+                        onvalue=True,
+                        offvalue=False)
+        outCheckBtn.grid(row=0, column=0, padx=(30, 5), pady=(20, 30), columnspan=2)
+
+        #Lista de [data, check data] quando confirmar data = check data
+        # toBind = [
+        #             [self.externalOutput, outputCheck],
+        #         ]
+
+        toBind = {
+                    'externalOutput' : outputCheck
+                }
+        
+        comfirmButton = Button(opScreen, text='Comfirmar', command = lambda:self.confrimScreen(toBind, listScreenToCloseOnComfirm))
+        comfirmButton.grid(row=1, column=3, padx=(50, 30), pady=(0, 30))
+        
+        opScreen.grab_set()
+        opScreen.mainloop()
+        
+    def confrimScreen(self, dataBind, listScreenToCloseOnComfirm):
+        screen = Tk()
+        screen.title('Confirmação')
+        listScreenToCloseOnComfirm.append(screen)
+        
+        textLabel = Label(screen, text='Deseja salvar as altereções?')
+        textLabel.grid(row=0, column=0, padx=(30, 30), pady=(30, 50), columnspan=2)
+
+        comfirmButton = Button(screen, text='Salvar', command = lambda:self.confrimBind(listScreenToCloseOnComfirm, dataBind))
+        comfirmButton.grid(row=1, column=0, padx=(30, 50), pady=(0, 30))
+
+        refuseButton = Button(screen, text='Descartar', command = screen.destroy)
+        refuseButton.grid(row=1, column=1, padx=(50, 30), pady=(0, 30))
+        
+        screen.mainloop()
+        
+    def confrimBind(self, listScreenToClose, dataBind):    
+        self.externalOutput=dataBind['externalOutput'].get()
+        
+        for screen in reversed(listScreenToClose):
+            screen.destroy()
+            
+        messagebox.showinfo(title='Alterado', message='Alterações concluidas')
+
+
+
+        
 mainScreen = Tk()
 GraphicUserInterface(mainScreen)
 mainScreen.mainloop()

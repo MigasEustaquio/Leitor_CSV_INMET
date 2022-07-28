@@ -14,7 +14,7 @@ def geraGrafico(eixoX, legendaX, eixoY, legendaY, titulo):
     plt.show()
 
 #Plota gráfico utilizando recursos da biblioteca plotly
-def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo): 
+def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, browserOpen = False): 
     variaveis=legendaY.copy()
     figureData = make_subplots(specs=[[{"secondary_y": True}]])
     
@@ -76,7 +76,7 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo):
     #ticklabelstep=1
     if secondary_y_title == True:
         fig.update_yaxes(title_text='Horas de Sol Pleno (HSP)', secondary_y=True)
-    py.plot(fig, auto_open = False)
+    py.plot(fig, auto_open = browserOpen)
 
 
 def geraGraficoHSP(eixoX, legendaX, eixoY, legendaY):
