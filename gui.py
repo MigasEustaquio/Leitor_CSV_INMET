@@ -299,8 +299,21 @@ class GraphicUserInterface(object):
         try:
             idxItem = self.listboxLabels.curselection()[0]
             variavel = self.listboxLabels.get(idxItem)
-            self.treeViewEntrys.insert('','end', values=(tipo, data, variavel))
+
+            if(tipo == 'Diário' and data in self.dataFrameDia):
+                self.treeViewEntrys.insert('','end', values=(tipo, data, variavel))
+
+            elif(tipo == 'Mensal' and data in self.dataFrameMes):
+                self.treeViewEntrys.insert('','end', values=(tipo, data, variavel))
+                    
+            elif(tipo == 'Anual' and data in self.dataFrameAno):
+                self.treeViewEntrys.insert('','end', values=(tipo, data, variavel))
+
+            else:
+                showinfo(title='Erro', message='Data não encontrada')
+            
             if not BtnVoltar: self.voltarDefault()
+
         except IndexError:
             showinfo(title='Erro', message='Selecione uma Variável')
             return
