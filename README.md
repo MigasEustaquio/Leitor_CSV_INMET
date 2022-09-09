@@ -1,26 +1,11 @@
 Programa desenvolvido em parceria com @carlosrvilela como trabalho de conclusão de curso de Engenharia de Computação UFG
 
-# Versão 0.5
+# Versão 1.0.0
 
 ## ☕ Usando Leitor_CSV_INMET
 
-Para usar Leitor_CSV_INMET, siga estas etapas:
-
-1. Vá para o [site oficial do INMET](https://tempo.inmet.gov.br/TabelaEstacoes/A002) e selecione a substação e a data da qual deseja utilizar as informações.
-2. Baixe o(s) arquivo(s) CSV indicado no site e coloque o(s) mesmo(s) na pasta 'arquivos' na raiz do repositório.
-3. Abra o arquivo [leitorCSV.py](leitorCSV.py) e insira os nomes dos arquivos CSV no formato de lista na declaração da constante 'NOMES_ARQUIVOS' e especifiqueo mês de referência na constante 'MES_DE_REFERENCIA' ('04/2022').
-4. Para mostrar os valores de irradiação médios diários de um mês utilize a função 'radiacaoMediaValida'.
-5. Para gerar um gráfico utilize as funções 'mediaDia' e 'geraGraficoBonito'.
-
-
-## ☕ Usando Leitor_CSV_INMET
-
-Para usar Leitor_CSV_INMET, siga estas etapas:
-
-```
-python3 leitorCSV.py
-```
-
+Para usar Leitor_CSV_INMET, siga este manual: 
+[Guia de Usuário](https://docs.google.com/document/d/16LtWiOdAq1zBPLJj3_9v3I3rdGzFP5cKeywaL3hJAGQ/edit?usp=sharing)
 
 
 ## 🤝 Colaboradores
