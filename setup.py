@@ -15,5 +15,5 @@ setup(
     version="1.0.0",
     description="Ferramenta computacional desenvolvida para apuração de dados meteorológicos, com finalidade de promover métricas auxiliares em projetos  fotovoltaicos",
     options={"build_exe": build_exe_options},
-    executables=[Executable("gui.py", base=base)],
+    executables=[Executable("Leitor_CSV_INMET.py", base=base)],
 )
