@@ -2,9 +2,14 @@ Programa desenvolvido em parceria com @carlosrvilela como trabalho de conclusão
 
 # Versão 1.0.0
 
+## 💻 Instalando Leitor_CSV_INMET
+
+Para fazer a instalação do software siga este manual:
+[Guia de Instalação](https://docs.google.com/document/d/1yDYiHrilVsaL9JHZi01IK6EUE-eHUB62Xbyggwco3DM/edit?usp=sharing)
+
 ## ☕ Usando Leitor_CSV_INMET
 
-Para usar Leitor_CSV_INMET, siga este manual: 
+Para usar o software siga este manual: 
 [Guia de Usuário](https://docs.google.com/document/d/16LtWiOdAq1zBPLJj3_9v3I3rdGzFP5cKeywaL3hJAGQ/edit?usp=sharing)
 
 
