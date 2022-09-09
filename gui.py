@@ -118,7 +118,7 @@ class GraphicUserInterface(object):
         self.dataFrameSeparadoAno=False
         self.numeroEntriesData=0
         
-        self.externalOutput = False
+        self.externalOutput = True
 
 
         root.title('Leitor CSV INMET')
@@ -167,9 +167,11 @@ class GraphicUserInterface(object):
         self.toViewButtonInfo = self.toViewButton.grid_info()
         self.toViewButton.grid_forget()
 
-        configButton = Button(botContainer, text='Opções', command = lambda:self.configScreen(root))
+        configButton = Button(botContainer, text='Opções')
+        #command = lambda:self.configScreen(root) "removido" pois o executavel não integra com agraphicWindow
         configButton.grid(column=self.toViewButtonInfo["column"]+1, row=self.toViewButtonInfo["row"], padx=(400,5))
         configButtonInfo = configButton.grid_info()
+        
 
         suportButton = Button(botContainer, text='Suporte')
         suportButton.grid(column=configButtonInfo["column"]+1, row=selectFileButtonInfo["row"], )
@@ -594,11 +596,6 @@ class GraphicUserInterface(object):
                         onvalue=True,
                         offvalue=False)
         outCheckBtn.grid(row=0, column=0, padx=(30, 5), pady=(20, 30), columnspan=2)
-
-        #Lista de [data, check data] quando confirmar data = check data
-        # toBind = [
-        #             [self.externalOutput, outputCheck],
-        #         ]
 
         toBind = {
                     'externalOutput' : outputCheck
