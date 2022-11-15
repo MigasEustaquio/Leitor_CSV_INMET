@@ -437,6 +437,8 @@ class GraphicUserInterface(object):
          
     def gera_grafico_unico(self, values):
         tipo, data, variavel = values
+        addInfo = []
+
         print(tipo, data, variavel)  
         df = pd.DataFrame
         if tipo == 'Diário':
@@ -454,6 +456,10 @@ class GraphicUserInterface(object):
         else: 
             mediaPorHora, horasDoDia = mediaDia(df, variavel, self.fuso)
         titulo=f'Gráfico {variavel}, média {tipo}: {data}'
+
+        if variavel == 'Radiacao (Wh/m²)':
+            valor_medio_dia = data+': '+str(round(sum(mediaPorHora)/1000, 2))+' KWh/m².dia'
+            addInfo.append(valor_medio_dia)
         
         legendaX='Hora '
         try:
@@ -461,7 +467,7 @@ class GraphicUserInterface(object):
         except:
             legendaX=legendaX+'(UTC'+self.fuso+')'
 
-        geraGraficoBonito([horasDoDia], legendaX, [mediaPorHora], [variavel], [titulo], self.externalOutput)
+        geraGraficoBonito([horasDoDia], legendaX, [mediaPorHora], [variavel], [titulo], self.externalOutput, addInfo)
         if (not self.externalOutput):
             GW.main()
 
@@ -471,6 +477,8 @@ class GraphicUserInterface(object):
         listHorasDoDia = []
         listTitulo = []
         listVariaveis = []
+        addInfos = []
+
         for value in (listValues):
             tipo, data, variavel = value
             df = pd.DataFrame
@@ -489,6 +497,12 @@ class GraphicUserInterface(object):
             else: 
                 mediaPorHora, horasDoDia = mediaDia(df, variavel, self.fuso)
 
+            if variavel == 'Radiacao (Wh/m²)':
+                valor_medio_dia = data+': '+str(round(sum(mediaPorHora)/1000, 2))+' KWh/m².dia'
+                addInfos.append(valor_medio_dia)
+            else:
+                addInfos.append('')
+
             listVariaveis.append(variavel)
             listMediaPorHora.append(mediaPorHora)
             listHorasDoDia.append(horasDoDia)
@@ -500,7 +514,7 @@ class GraphicUserInterface(object):
             legendaX=legendaX+FUSO_BR[self.fuso]
         except:
             legendaX=legendaX+'(UTC'+self.fuso+')'
-        geraGraficoBonito(listHorasDoDia, legendaX, listMediaPorHora, listVariaveis, listTitulo, self.externalOutput)
+        geraGraficoBonito(listHorasDoDia, legendaX, listMediaPorHora, listVariaveis, listTitulo, self.externalOutput, addInfos)
         if (not self.externalOutput):
             GW.main()
 

@@ -14,7 +14,7 @@ def geraGrafico(eixoX, legendaX, eixoY, legendaY, titulo):
     plt.show()
 
 #Plota gráfico utilizando recursos da biblioteca plotly
-def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, browserOpen = False): 
+def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, browserOpen = False, addInfo = False):
     variaveis=legendaY.copy()
     figureData = make_subplots(specs=[[{"secondary_y": True}]])
     
@@ -53,8 +53,12 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, browserOpen = Fa
             figureData.add_trace(trace2, secondary_y=True)
             
         else:
+         
             max_valuesX, max_valuesY, min_valuesX, min_valuesY = get_max_min(eixoX[curva], eixoY[curva])
-            mainData = go.Scatter(x = eixoX[curva], y = eixoY[curva], mode = 'markers+lines', name = titulo[curva])
+            if addInfo[curva]:
+                mainData = go.Scatter(x = eixoX[curva], y = eixoY[curva], mode = 'markers+lines', name = titulo[curva]+'<br>'+addInfo[curva])
+            else:
+                mainData = go.Scatter(x = eixoX[curva], y = eixoY[curva], mode = 'markers+lines', name = titulo[curva])
             maxValuesData = go.Scatter(x = max_valuesX, y = max_valuesY, mode = 'markers', marker_symbol = 'triangle-up', marker=dict(size=10), name = 'Valor Máximo '+titulo[curva])
             minValuesData = go.Scatter(x = min_valuesX, y = min_valuesY, mode = 'markers', marker_symbol = 'triangle-down', marker=dict(size=10), name = 'Valor Mínimo '+titulo[curva])
             
