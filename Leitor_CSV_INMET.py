@@ -4,6 +4,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import ttk
 from tkinter.messagebox import showinfo
+import webbrowser
 
 from util.manipulaDataFame import *
 from util.manipulaAquivo import *
@@ -105,6 +106,8 @@ def getAllTreeViewEntrys(tree):
             listValues.append(tree.item(idxItem, 'values'))
     return listValues
 
+def openInBrowser(url):
+   webbrowser.open_new(url)
 class GraphicUserInterface(object): 
     def __init__(self,  root):
         self.dataFrame = pd.DataFrame
@@ -124,7 +127,7 @@ class GraphicUserInterface(object):
         root.title('Leitor CSV INMET')
         topContainer = Frame(root)
         
-        ajudaButton = Button(topContainer, text='Como usar?')
+        ajudaButton = Button(topContainer, text='Como usar?', command = lambda:self.helpScreen(root))
         ajudaButton.grid(column=0, row=0, padx=(15,600), pady=15)
         ajudaButtonInfo = ajudaButton.grid_info()
 
@@ -644,6 +647,29 @@ class GraphicUserInterface(object):
             screen.destroy()
             
         messagebox.showinfo(title='Alterado', message='Alterações concluidas')
+
+    def helpScreen(self, root):
+        helpScreen = Toplevel(root)
+        helpScreen.title('Informações')
+
+        infoText = Label(helpScreen, text="Informações: \n")
+        infoText.grid(row=0, column=0, padx=(100, 100), pady=(50, 0))
+        infoTextInfo=infoText.grid_info()  
+
+        container = Frame(helpScreen)
+
+        
+        userGuide = Label(container, text="   •Guia de Usuário", fg="blue", cursor="hand2")
+        userGuide.grid(row=0, column=0, sticky = NW)
+        userGuideInfo=userGuide.grid_info()
+        userGuide.bind("<Button-1>", lambda e: openInBrowser("https://docs.google.com/document/d/16LtWiOdAq1zBPLJj3_9v3I3rdGzFP5cKeywaL3hJAGQ"))
+
+        repositorio = Label(container, text="   •Repositório GitHub", fg="blue", cursor="hand2")
+        repositorio.grid(row=userGuideInfo["row"]+1, column=userGuideInfo["column"], sticky=userGuideInfo["sticky"])
+        repositorioInfo=repositorio.grid_info()
+        repositorio.bind("<Button-1>", lambda e: openInBrowser("https://github.com/MigasEustaquio/Leitor_CSV_INMET"))
+
+        container.grid(row=infoTextInfo["row"]+1, column=infoTextInfo["column"],padx=(0, 100), pady=(0, 50))
 
 
 
