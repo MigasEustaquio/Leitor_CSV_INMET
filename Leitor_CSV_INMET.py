@@ -463,6 +463,8 @@ class GraphicUserInterface(object):
         if variavel == 'Radiacao (Wh/m²)':
             valor_medio_dia = data+': '+str(round(sum(mediaPorHora)/1000, 2))+' KWh/m².dia'
             addInfo.append(valor_medio_dia)
+        else:
+            addInfo.append('')
         
         legendaX='Hora '
         try:
@@ -527,13 +529,15 @@ class GraphicUserInterface(object):
         if not recarregar_dataframe:
             self.fileNames=filedialog.askopenfilenames(filetypes=[("CSV files", ".csv")])
             filedialog.askopenfile
-        self.setDataFrame(self.fileNames)
 
-        formatedNames = self.formatText(self.fileNames)
-        self.labelNomesDosArquivos["text"] = formatedNames
-        showElement(self.hidenLabelButton, self.infoHidenLabelButton)
+        if self.fileNames != '':
+            self.setDataFrame(self.fileNames)
 
-        showElement(self.toViewButton, self.toViewButtonInfo)
+            formatedNames = self.formatText(self.fileNames)
+            self.labelNomesDosArquivos["text"] = formatedNames
+            showElement(self.hidenLabelButton, self.infoHidenLabelButton)
+
+            showElement(self.toViewButton, self.toViewButtonInfo)
 
     # Chama as funções padrões para tratamento do Dataframe
     def setDataFrame(self, fileNames):
