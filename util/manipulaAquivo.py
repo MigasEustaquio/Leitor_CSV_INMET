@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 
 #Lê o arquvo csv e substitui "," por "."
@@ -16,3 +17,7 @@ def getFiles(fullpaths):
         df = df.replace(',', '.', regex=True)
         dfs.append(df)
     return dfs
+
+def exportaDfEmXls(df, file_name, exportPath):
+    df.to_excel(os.getcwd()+exportPath+file_name+'.xlsx', sheet_name = 'Dados')
+    print('Arquivo Excel Gerado.')
