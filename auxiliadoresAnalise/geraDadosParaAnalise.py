@@ -1,8 +1,9 @@
 import pandas as pd
-from util.funcoesDiversas import mediaDia
-
-from util.manipulaAquivo import exportaDfEmXls, ler_arquivos
-from util.manipulaDataFame import KJ_to_Wh, addTempMedia, concatenar_dfs, definir_fuso_horario, separar_dataframes_mes, string_para_numerico
+import sys
+sys.path.append("./util")
+from funcoesDiversas import mediaDia
+from manipulaAquivo import exportaDfEmXls, ler_arquivos
+from manipulaDataFame import KJ_to_Wh, addTempMedia, concatenar_dfs, definir_fuso_horario, separar_dataframes_mes, string_para_numerico
 
 def month_name(month):
     names = {
@@ -19,7 +20,7 @@ def month_name(month):
         '11': 'NOV',
         '12': 'DEZ'
     }
-    return names[month] 
+    return names[month]
 
 def valorMedio(dfMes, variavel):    
     valores = dfMes[variavel].values
@@ -42,7 +43,9 @@ def main():
     df = definir_fuso_horario(df, fuso)
     df = addTempMedia(df)
     df = KJ_to_Wh(df)
-
+    
+    geraTemPorHora(df, fuso)
+    
     dicionario_de_meses = separar_dataframes_mes(df, fuso)
 
     periodos = list(dicionario_de_meses.keys())
@@ -120,5 +123,14 @@ def criaDf(vars):
     novoDf = pd.DataFrame(index=meses, columns=vars)
     return novoDf
 
+def geraTemPorHora(df, fuso):
+    mediaPorHora, horasDoDia = mediaDia(df, 'Temp. Ins. (C)', fuso)
+    novoDf = novoDf = pd.DataFrame()
+    novoDf['Hora (h)'] = horasDoDia
+    novoDf['Tα(°C)'] = mediaPorHora
+    print('Dados Solarmetricos Temperatura Ambiente')
+    print(novoDf)
+    exportaDfEmXls(novoDf, 'DadosSolarmetricosTempAmbiente', '/auxiliadoresAnalise/EstudoDeCaso/')
+    
 if __name__ == '__main__':
     main()

@@ -8,4 +8,6 @@ tkinterTestes.py
 **/build/
 **/dist/
 tests.py
+auxiliadoresAnalise/DadosParaRadiasol
+auxiliadoresAnalise/SaidaRadiasol
 
