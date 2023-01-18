@@ -48,7 +48,7 @@ def geraDadosSolarmetricosIrradianciaMedia():
             auxDf = pd.DataFrame({'Global':[0], 'Direta':[0], 'Difusa':[0], 'Inclinada':[0]}, index=[hora])
             dfInf=pd.concat([dfInf, auxDf])
 
-    grupHora = df.groupby(['Hora']).median()
+    grupHora = df.groupby(['Hora']).mean()
     dfFinal=grupHora.drop(columns=['Mês'])
     dfFinal=pd.concat([dfSup, dfFinal])
     dfFinal=pd.concat([dfFinal, dfInf])
