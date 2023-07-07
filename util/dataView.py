@@ -46,6 +46,9 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, browserOpen = Fa
                 name=hoverinformation+'.<br>'+titulo[curva],
                 orientation='v',
                 text=hoverinformation,
+                insidetextanchor = 'middle',
+                textposition='inside',
+                textangle=-90,
                 marker=dict(color='rgba(255, 255, 0, 0.4)')
             )
 
@@ -79,7 +82,7 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, browserOpen = Fa
     #tickmode = 'linear', tick0 = 0, dtick = 4
     #ticklabelstep=1
     if secondary_y_title == True:
-        fig.update_yaxes(title_text='Horas de Sol Pleno (HSP)', secondary_y=True)
+        fig.update_yaxes(title_text='Irradiância (W/m²)', secondary_y=True)
     py.plot(fig, auto_open = browserOpen)
 
 
