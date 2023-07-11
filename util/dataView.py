@@ -16,9 +16,9 @@ def geraGrafico(eixoX, legendaX, eixoY, legendaY, titulo):
 #Plota gráfico utilizando recursos da biblioteca plotly
 def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, browserOpen = False, addInfo = False):
     variaveis=legendaY.copy()
-    figureData = make_subplots(specs=[[{"secondary_y": True}]])
-    
+    addSecondary_y = False
     titulos=''
+
     for i in titulo:
         titulos += i+'<br>'
     strLegendaY=''
@@ -26,9 +26,12 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, browserOpen = Fa
     for i in set(variaveis):
         if i == 'Horas de Sol Pleno (HSP)':
             secondary_y_title=True
-            pass
+            if(len(set(variaveis)) > 1):
+                addSecondary_y=True
         else:
             strLegendaY += i+'<br>'
+
+    figureData = make_subplots(specs=[[{"secondary_y": addSecondary_y}]])
 
     for curva in range(len(legendaY)):
         if(legendaY[curva]=='Horas de Sol Pleno (HSP)'):
@@ -52,8 +55,8 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, browserOpen = Fa
                 marker=dict(color='rgba(255, 255, 0, 0.4)')
             )
 
-            figureData.add_trace(trace1, secondary_y=True)
-            figureData.add_trace(trace2, secondary_y=True)
+            figureData.add_trace(trace1, secondary_y=addSecondary_y)
+            figureData.add_trace(trace2, secondary_y=addSecondary_y)
             
         else:
          
@@ -82,7 +85,7 @@ def geraGraficoBonito(eixoX, legendaX, eixoY, legendaY, titulo, browserOpen = Fa
     #tickmode = 'linear', tick0 = 0, dtick = 4
     #ticklabelstep=1
     if secondary_y_title == True:
-        fig.update_yaxes(title_text='Irradiância (W/m²)', secondary_y=True)
+        fig.update_yaxes(title_text='Irradiância (W/m²)', secondary_y=addSecondary_y)
     py.plot(fig, auto_open = browserOpen)
 
 

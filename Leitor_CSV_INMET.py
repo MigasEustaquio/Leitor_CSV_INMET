@@ -455,13 +455,13 @@ class GraphicUserInterface(object):
             return
         print(df)
         if variavel == 'Horas de Sol Pleno (HSP)': 
-            mediaPorHora, horasDoDia = mediaDia(df, 'Radiacao (Wh/m²)', self.fuso)
+            mediaPorHora, horasDoDia = mediaDia(df, 'Irradiancia (W/m²)', self.fuso)
         else: 
             mediaPorHora, horasDoDia = mediaDia(df, variavel, self.fuso)
         titulo=f'Gráfico {variavel}, média {tipo}: {data}'
 
-        if variavel == 'Radiacao (Wh/m²)':
-            valor_medio_dia = data+': '+str(round(sum(mediaPorHora)/1000, 2))+' KWh/m².dia'
+        if variavel == 'Irradiancia (W/m²)':
+            valor_medio_dia = data+': '+str(round(sum(mediaPorHora)/1000, 2))+' KW/m².dia'
             addInfo.append(valor_medio_dia)
         else:
             addInfo.append('')
@@ -498,12 +498,12 @@ class GraphicUserInterface(object):
                 return
             
             if variavel == 'Horas de Sol Pleno (HSP)': 
-                mediaPorHora, horasDoDia = mediaDia(df, 'Radiacao (Wh/m²)', self.fuso)
+                mediaPorHora, horasDoDia = mediaDia(df, 'Irradiancia (W/m²)', self.fuso)
             else: 
                 mediaPorHora, horasDoDia = mediaDia(df, variavel, self.fuso)
 
-            if variavel == 'Radiacao (Wh/m²)':
-                valor_medio_dia = data+': '+str(round(sum(mediaPorHora)/1000, 2))+' KWh/m².dia'
+            if variavel == 'Irradiancia (W/m²)':
+                valor_medio_dia = data+': '+str(round(sum(mediaPorHora)/1000, 2))+' KW/m².dia'
                 addInfos.append(valor_medio_dia)
             else:
                 addInfos.append('')
@@ -546,8 +546,8 @@ class GraphicUserInterface(object):
         self.dataFrame = string_para_numerico(self.dataFrame)
         self.dataFrame = definir_fuso_horario(self.dataFrame, self.fuso)
         self.dataFrame = addTempMedia(self.dataFrame)
-        self.dataFrame = KJ_to_Wh(self.dataFrame)
-
+        self.dataFrame = addIrradiance(self.dataFrame)
+        
     def formatText(self, fileNames):
         finalText=''
         for text in fileNames:
